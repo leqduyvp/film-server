@@ -19,13 +19,7 @@ const RateSchema = new mongoose.Schema({
       type: Number,
       required: true
     }
-  }],
-  rate: {
-    type: Array,
-    default: [],
-    required: true
-  }
-
+  }]
 });
 
 const Rate = mongoose.model('Rate', RateSchema);

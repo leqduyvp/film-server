@@ -33,11 +33,7 @@ const UserSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       require: false
     }
-  }],
-  ratedFilms: {
-    type: Array,
-    required: false
-  }
+  }]
 });
 
 const User = mongoose.model('User', UserSchema);
