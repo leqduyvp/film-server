@@ -1,0 +1,59 @@
+const getRateByFilmId = require('../database/rate.getRateByFilmId');
+const rateSave = require('../database/rate.save');
+const userSave = require('../database/users.save');
+
+async function calcNewRate(req, filmRate) {
+  const checkRatedFilm = req.user.ratedFilms.filter((ratedFilm) => {
+    return (ratedFilm.filmId.toString() == filmRate.filmId.toString());
+  });
+
+  if (checkRatedFilm.length) {
+    throw new Error('This film is rated by current user');
+  }
+
+  const userRated = filmRate.rate.length;
+  filmRate.ratingNumber = ((filmRate.ratingNumber * userRated) + req.body.rate) / (userRated + 1);
+  filmRate.rate.push({
+    userId: req.user._id,
+    rating: req.body.rate
+  });
+
+  req.user.ratedFilms.push({ filmId: filmRate.filmId });
+
+  await userSave(req.user);
+  await rateSave(filmRate);
+}
+
+module.exports = async (req, res, next) => {
+  try {
+    const filmId = req.query.filmId;
+    const filmRate = await getRateByFilmId(filmId);
+    if (!filmRate) {
+      return res.status(400).send({
+        error: {
+          isError: true,
+          errorMessage: {
+            filmId: 'Invalid film'
+          }
+        }
+      });
+    }
+    await calcNewRate(req, filmRate);
+    res.status(201).send({
+      error: {
+        isError: false,
+        errorMessage: {}
+      }
+    });
+  } catch (e) {
+    console.log(e.message);
+    return res.status(500).send({
+      error: {
+        isError: true,
+        errorMessage: {
+          server: e.message
+        }
+      }
+    });
+  }
+}
