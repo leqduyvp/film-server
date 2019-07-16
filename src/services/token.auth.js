@@ -5,7 +5,7 @@ const secret = require('../config/jwtSecret');
 module.exports = async (req, res, next) => {
   try {
     const token = req.header('access-token');
-    const id = jwt.verify(token, secret);
+    const id = jwt.verify(token, secret).id;
     const user = await findUserById(id);
 
     if (!user) {
