@@ -1,3 +1,5 @@
+const getRateByFilmId = require('../database/rate.getRateByFilmId');
+
 const rateValid = (rate, error) => {
   if (Math.floor(rate) * 10 != rate * 10) {
     error.isError = true;
@@ -9,11 +11,24 @@ const rateValid = (rate, error) => {
 }
 
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   const error = { isError: false, errorMessage: {} };
+  const filmRate = await getRateByFilmId(req.query.filmId);
+
+  if (!filmRate) {
+    return res.status(400).send({
+      error: {
+        isError: true,
+        errorMessage: {
+          filmId: 'Invalid film'
+        }
+      }
+    });
+  }
+
   rateValid(req.body.rate, error);
 
-  if (error.isError)
-    return res.status(400).send({ error });
+  if (error.isError) return res.status(400).send({ error });
+  req.filmRate = filmRate;
   next();
 }

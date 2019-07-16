@@ -1,4 +1,3 @@
-const getRateByFilmId = require('../database/rate.getRateByFilmId');
 const rateSave = require('../database/rate.save');
 
 async function calcNewRate(req, filmRate) {
@@ -20,20 +19,7 @@ async function calcNewRate(req, filmRate) {
 
 module.exports = async (req, res, next) => {
   try {
-    const filmRate = await getRateByFilmId(req.query.filmId);
-
-    if (!filmRate) {
-      return res.status(400).send({
-        error: {
-          isError: true,
-          errorMessage: {
-            filmId: 'Invalid film'
-          }
-        }
-      });
-    }
-
-    calcNewRate(req, filmRate);
+    await calcNewRate(req, req.filmRate);
 
     res.send({
       error: {
