@@ -9,7 +9,7 @@ const RateSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true
   },
-  rate: [{
+  rates: [{
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       unique: true,
