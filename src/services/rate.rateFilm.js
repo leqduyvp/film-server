@@ -11,9 +11,9 @@ async function calcNewRate(req, filmRate) {
     throw new Error('This film is rated by current user');
   }
 
-  const userRated = filmRate.rate.length;
+  const userRated = filmRate.rates.length;
   filmRate.ratingNumber = ((filmRate.ratingNumber * userRated) + req.body.rate) / (userRated + 1);
-  filmRate.rate.push({
+  filmRate.rates.push({
     userId: req.user._id,
     rating: req.body.rate
   });
