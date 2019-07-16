@@ -3,6 +3,8 @@ const router = new express.Router();
 const userValid = require('../services/users.valid');
 const userSave = require('../services/users.save');
 const userLogin = require('../services/users.login');
+const authToken = require('../services/token.auth');
+const userLogout = require('../services/users.logout');
 //Dang Ky
 router.post('/register', userValid, userSave);
 //(req, res) => {
@@ -25,14 +27,15 @@ router.post('/login', userLogin);
 // });
 
 //Dang xuat
-router.post('/logout', (req, res) => {
-  res.send({
-    error: {
-      isError: false,
-      errorMessage: {}
-    }
-  });
-});
+router.post('/logout', authToken, userLogout);
+// (req, res) => {
+//   res.send({
+//     error: {
+//       isError: false,
+//       errorMessage: {}
+//     }
+//   });
+// });
 
 //Lay profile
 router.get('/me', (req, res) => {

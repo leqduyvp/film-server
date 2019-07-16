@@ -18,7 +18,7 @@ module.exports = async (req, res, next) => {
       return res.status(400).send({ error: user.error });
     }
     res.send({
-      'access-token': jwt.sign({ id: user._id }, secret),
+      'access-token': jwt.sign({ id: user._id }, secret, { expiresIn: '20s' }),
       error: {
         isError: false,
         errorMessage: {}
