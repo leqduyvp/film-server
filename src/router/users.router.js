@@ -2,7 +2,7 @@ const express = require('express');
 const router = new express.Router();
 const userValid = require('../services/users.valid');
 const userSave = require('../services/users.save');
-
+const userLogin = require('../services/users.login');
 //Dang Ky
 router.post('/register', userValid, userSave);
 //(req, res) => {
@@ -15,13 +15,14 @@ router.post('/register', userValid, userSave);
 // });
 
 //Dang nhap
-router.post('/login', (req, res) => {
-  res.send({
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDI1OWUzZjI3OGE4NjMzZ" +
-      "jRiYzg3MDQiLCJpYXQiOjE1NjI4MzE3MDF9.e58bXnXQGQg9d-ep6FJ5sFqseLPKeZzLhDzGAAnbBE4",
-    "error": { "isError": false, "errorMessage": {} }
-  });
-});
+router.post('/login', userLogin);
+// (req, res) => {
+//   res.send({
+//     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDI1OWUzZjI3OGE4NjMzZ" +
+//       "jRiYzg3MDQiLCJpYXQiOjE1NjI4MzE3MDF9.e58bXnXQGQg9d-ep6FJ5sFqseLPKeZzLhDzGAAnbBE4",
+//     "error": { "isError": false, "errorMessage": {} }
+//   });
+// });
 
 //Dang xuat
 router.post('/logout', (req, res) => {
