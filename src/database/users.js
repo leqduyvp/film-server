@@ -6,9 +6,11 @@ const findUserById = async (id) => {
 }
 
 const userSave = async (user) => {
-  user.password = await brcypt.hash(user.password, 8);
-  user.name = user.name.trim();
-  user.name = user.name.toLowerCase();
+  if (!user._id) {
+    user.password = await brcypt.hash(user.password, 8);
+    user.name = user.name.trim();
+    user.name = user.name.toLowerCase();
+  }
   return new User(user).save();
 }
 
