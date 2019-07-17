@@ -1,11 +1,79 @@
 const jwt = require('jsonwebtoken');
+const redis = require('redis');
 const findUserById = require('../database/users.findById');
 const secret = require('../config/jwtSecret');
+
+const client = redis.createClient();
+
+//Token: userId: Required
+//       deviceId: Option
+const handleRedisError = (err, res) => {
+  res.status(500).send({
+    error: {
+      isError: true,
+      errorMessage: {
+        server: err.message
+      }
+    }
+  });
+}
+
+const checkTokenExist = (tokenKey, token, res, next) => {
+  client.KEYS(tokenKey, (err, reply) => {
+    if (err) { return handleRedisError(err, res) }
+    if (!reply.length) {
+      return res.status(400).send({
+        error: {
+          isError: true,
+          errorMessage: {
+            token: 'No token available on this platform'
+          }
+        }
+      })
+    }
+    
+    client.get(tokenKey, (e, tokenValue) => {
+      if (e) { return handleRedisError(e, res) }
+      if (token != tokenValue) return res.status(400).send({
+        error: {
+          isError: true,
+          errorMessage: {
+            token: 'Token incorrect'
+          }
+        }
+      });
+      next();
+    });
+  });
+}
+
+const handleTokenDatabaseError = (err, res) => {
+  if (err.message.indexOf('jwt') >= 0 || err.message.indexOf('token') >= 0) {
+    return res.status(400).send({
+      error: {
+        isError: true,
+        errorMessage: {
+          token: err.message
+        }
+      }
+    });
+  }
+
+  res.status(500).send({
+    error: {
+      isError: true,
+      errorMessage: {
+        server: err.message
+      }
+    }
+  })
+}
 
 module.exports = async (req, res, next) => {
   try {
     const token = req.header('access-token');
     const id = jwt.verify(token, secret).id;
+
     const user = await findUserById(id);
 
     if (!user) {
@@ -13,22 +81,18 @@ module.exports = async (req, res, next) => {
         error: {
           isError: true,
           errorMessage: {
-            authenticate: 'Please authenticate'
+            token: 'Invalid token'
           }
         }
       });
     }
 
+    const platform = 'web';
+    const tokenKey = id.toString() + '_' + platform;
     req.user = user;
-    next();
+    req.tokenKey = tokenKey
+    checkTokenExist(tokenKey, token, res, next);
   } catch (error) {
-    res.status(500).send({
-      error: {
-        isError: true,
-        errorMessage: {
-          server: error.message
-        }
-      }
-    });
+    handleError(error, res);
   }
 }
