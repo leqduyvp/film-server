@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const redis = require('redis');
-const findUserById = require('../database/users.findById');
 const secret = require('../config/jwtSecret');
 
 const client = redis.createClient();
@@ -70,23 +69,11 @@ const handleTokenDatabaseError = (err, res) => {
 module.exports = async (req, res, next) => {
   try {
     const token = req.header('access-token');
-    const id = jwt.verify(token, secret).id;
-
-    const user = await findUserById(id);
-    if (!user) {
-      return res.status(400).send({
-        error: {
-          isError: true,
-          errorMessage: {
-            token: 'Invalid token'
-          }
-        }
-      });
-    }
-
-    const platform = 'web';
+    const decoded = jwt.verify(token, secret);
+    const { id, platform } = decoded;
     const tokenKey = id.toString() + '_' + platform;
-    req.user = user;
+
+    req.userId = id;
     req.tokenKey = tokenKey
     req.client = client;
     checkTokenExist(tokenKey, token, res, next);
