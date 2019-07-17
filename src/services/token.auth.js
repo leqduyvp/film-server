@@ -19,32 +19,30 @@ const handleRedisError = (err, res) => {
 }
 
 const checkTokenExist = (tokenKey, token, res, next) => {
-  client.KEYS(tokenKey, (err, reply) => {
-    if (err) { return handleRedisError(err, res) }
-    if (!reply.length) {
+  client.get(tokenKey, (e, tokenValue) => {
+    if (e) { return handleRedisError(e, res) }
+    if (!tokenValue) {
       return res.status(400).send({
         error: {
           isError: true,
           errorMessage: {
-            token: 'No token available on this platform'
+            token: 'Invalid token'
           }
         }
       })
     }
-    
-    client.get(tokenKey, (e, tokenValue) => {
-      if (e) { return handleRedisError(e, res) }
-      if (token != tokenValue) return res.status(400).send({
-        error: {
-          isError: true,
-          errorMessage: {
-            token: 'Token incorrect'
-          }
+
+    if (token != tokenValue) return res.status(400).send({
+      error: {
+        isError: true,
+        errorMessage: {
+          token: 'Token incorrect'
         }
-      });
-      next();
+      }
     });
+    next();
   });
+  // });
 }
 
 const handleTokenDatabaseError = (err, res) => {
@@ -93,6 +91,6 @@ module.exports = async (req, res, next) => {
     req.tokenKey = tokenKey
     checkTokenExist(tokenKey, token, res, next);
   } catch (error) {
-    handleError(error, res);
+    handleTokenDatabaseError(error, res);
   }
 }
