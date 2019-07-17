@@ -1,5 +1,5 @@
-const rateSave = require('../database/rate.save');
-const userSave = require('../database/users.save');
+const { rateSave } = require('../database/rate');
+const { userSave } = require('../database/users');
 
 async function calcNewRate(req, filmRate) {
   const checkRatedFilm = req.user.ratedFilms.filter((ratedFilm) => {

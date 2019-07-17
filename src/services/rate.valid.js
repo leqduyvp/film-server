@@ -1,4 +1,4 @@
-const getRateByFilmId = require('../database/rate.getRateByFilmId');
+const { getRateByFilmId } = require('../database/rate');
 
 const rateValid = (rate, error) => {
   if (Math.floor(rate) * 10 != rate * 10) {

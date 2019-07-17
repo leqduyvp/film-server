@@ -1,8 +1,6 @@
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const findUserById = require('../database/users.findById');
-const checkEmailExist = require('../database/users.checkEmailExist');
-
+const { findUserById, checkEmailExist } = require('../database/users');
 
 const validEmail = async (user, error) => {
   const isNewEmail = !(await checkEmailExist(user.email));

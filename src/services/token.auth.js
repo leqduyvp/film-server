@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const redis = require('redis');
-const findUserById = require('../database/users.findById');
+const { findUserById } = require('../database/users');
 const secret = require('../config/jwtSecret');
 
 const client = redis.createClient();
