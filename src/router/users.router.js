@@ -5,55 +5,18 @@ const userSave = require('../services/users.save');
 const userLogin = require('../services/users.login');
 const authToken = require('../services/token.auth');
 const userLogout = require('../services/users.logout');
+const getUserProfile = require('../services/users.getProfile');
 //Dang Ky
 router.post('/register', userValid, userSave);
-//(req, res) => {
-//   res.send({
-//     error: {
-//       isError: false,
-//       errorMessage: {}
-//     }
-//   });
-// });
 
 //Dang nhap
 router.post('/login', userLogin);
-// (req, res) => {
-//   res.send({
-//     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDI1OWUzZjI3OGE4NjMzZ" +
-//       "jRiYzg3MDQiLCJpYXQiOjE1NjI4MzE3MDF9.e58bXnXQGQg9d-ep6FJ5sFqseLPKeZzLhDzGAAnbBE4",
-//     "error": { "isError": false, "errorMessage": {} }
-//   });
-// });
 
 //Dang xuat
 router.post('/logout', authToken, userLogout);
-// (req, res) => {
-//   res.send({
-//     error: {
-//       isError: false,
-//       errorMessage: {}
-//     }
-//   });
-// });
 
 //Lay profile
-router.get('/me', (req, res) => {
-  res.send({
-    "error": {
-      "isError": false,
-      "errorMessage": {}
-    },
-    "user": {
-      "dateRegistered": "2019-07-10T08:13:40.824Z",
-      "watchedFilms": null,
-      "ratedFilms": [],
-      "email": "nguyenxuanphuc@gmail.com",
-      "name": "XuanPhuc",
-      "accType": 2
-    }
-  });
-});
+router.get('/me', authToken, getUserProfile);
 
 //Sua profile
 router.patch('/edit', (req, res) => {
