@@ -1,4 +1,4 @@
-const findUserByCredentials = require('../database/users.findByCredentials');
+const { findUserByCredentials } = require('../database/users');
 const generateToken = require('../services/token.generate');
 
 const validCredentials = (req) => {

@@ -14,7 +14,36 @@ const userSave = async (user) => {
   return new User(user).save();
 }
 
+const checkEmailExist = async (email) => {
+  return User.findOne({ email });
+}
+
+const findUserByCredentials = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (!user) return {
+    error: {
+      isError: true,
+      errorMessage: {
+        credentials: 'Wrong email or password'
+      }
+    }
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return {
+    error: {
+      isError: true,
+      errorMessage: {
+        credentials: 'Wrong email or password'
+      }
+    }
+  }
+
+  return user;
+}
+
 module.exports = {
   findUserById,
-  userSave
+  userSave,
+  checkEmailExist
 }

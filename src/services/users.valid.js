@@ -1,7 +1,6 @@
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const { findUserById } = require('../database/users');
-const checkEmailExist = require('../database/users.checkEmailExist');
+const { findUserById, checkEmailExist } = require('../database/users');
 const secret = require('../config/jwtSecret');
 
 const validEmail = async (user, error) => {
