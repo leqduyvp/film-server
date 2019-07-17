@@ -1,6 +1,7 @@
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const { findUserById, checkEmailExist } = require('../database/users');
+const secret = require('../config/jwtSecret');
 
 const validEmail = async (user, error) => {
   const isNewEmail = !(await checkEmailExist(user.email));
@@ -17,15 +18,20 @@ const validEmail = async (user, error) => {
 }
 
 const validAccType = async (user, error) => {
-  if (!user.accType || parseInt(user.accType) != parseFloat(user.accType) || user.accType < 0 || user.accType > 2) {
+
+  if (typeof user.accType == 'undefined') {
     error.isError = true;
-    if (!user.accType) error.errorMessage.accType = "Account Type is missing";
-    else error.errorMessage.accType = "Invalid Acount Type";
+    error.errorMessage.accType = 'Account Type is missing';
+  }
+
+  if (parseInt(user.accType) * 10 != user.accType * 10 || user.accType < 0 || user.accType > 2) {
+    error.isError = true;
+    error.errorMessage.accType = "Invalid Account Type";
   }
 
   if (user.accType == 0) {
     try {
-      const id = jwt.verify(user.token, secret);
+      const id = jwt.verify(user.token, secret).id;
       const userFound = await findUserById(id);
       if (!userFound) {
         error.isError = true;

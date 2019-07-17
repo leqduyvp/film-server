@@ -5,8 +5,8 @@ const findUserById = async (id) => {
   return User.findById(id);
 }
 
-const userSave = async (user, regis) => {
-  if (regis) {
+const userSave = async (user) => {
+  if (!user._id) {
     user.password = await brcypt.hash(user.password, 8);
     user.name = user.name.trim();
     user.name = user.name.toLowerCase();
@@ -16,6 +16,30 @@ const userSave = async (user, regis) => {
 
 const checkEmailExist = async (email) => {
   return User.findOne({ email });
+}
+
+const findUserByCredentials = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (!user) return {
+    error: {
+      isError: true,
+      errorMessage: {
+        credentials: 'Wrong email or password'
+      }
+    }
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return {
+    error: {
+      isError: true,
+      errorMessage: {
+        credentials: 'Wrong email or password'
+      }
+    }
+  }
+
+  return user;
 }
 
 module.exports = {
