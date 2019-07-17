@@ -1,4 +1,4 @@
-const userSave = require('../database/users.save');
+const { userSave } = require('../database/users');
 
 module.exports = async (req, res) => {
   try {

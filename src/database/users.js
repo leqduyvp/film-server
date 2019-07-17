@@ -1,9 +1,18 @@
-const User = require('../database/users.model');
+const User = require('./users.model');
 const brcypt = require('bcryptjs');
 
-module.exports = async (user) => {
+const findUserById = async (id) => {
+  return User.findById(id);
+}
+
+const userSave = async (user) => {
   user.password = await brcypt.hash(user.password, 8);
   user.name = user.name.trim();
   user.name = user.name.toLowerCase();
   return new User(user).save();
+}
+
+module.exports = {
+  findUserById,
+  userSave
 }

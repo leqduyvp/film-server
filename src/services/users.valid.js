@@ -1,6 +1,6 @@
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const findUserById = require('../database/users.findById');
+const { findUserById } = require('../database/users');
 const checkEmailExist = require('../database/users.checkEmailExist');
 const secret = require('../config/jwtSecret');
 
