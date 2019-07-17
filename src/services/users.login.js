@@ -25,7 +25,7 @@ module.exports = async (req, res, next) => {
     if (user.error) {
       return res.status(400).send({ error: user.error });
     }
-    const platform = 'web';
+    const platform = req.get('platform');
     generateToken(user._id, platform, res);
   } catch (e) {
     console.log(e.message);
