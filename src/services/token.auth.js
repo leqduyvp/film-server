@@ -73,7 +73,6 @@ module.exports = async (req, res, next) => {
     const id = jwt.verify(token, secret).id;
 
     const user = await findUserById(id);
-
     if (!user) {
       return res.status(400).send({
         error: {
@@ -89,6 +88,7 @@ module.exports = async (req, res, next) => {
     const tokenKey = id.toString() + '_' + platform;
     req.user = user;
     req.tokenKey = tokenKey
+    req.client = client;
     checkTokenExist(tokenKey, token, res, next);
   } catch (error) {
     handleTokenDatabaseError(error, res);
