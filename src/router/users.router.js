@@ -6,6 +6,7 @@ const userLogin = require('../services/users.login');
 const authToken = require('../services/token.auth');
 const userLogout = require('../services/users.logout');
 const getUserProfile = require('../services/users.getProfile');
+const changeUserProfile = require('../services/users.changeProfile');
 //Dang Ky
 router.post('/register', userValid, userSave);
 
@@ -19,14 +20,7 @@ router.post('/logout', authToken, userLogout);
 router.get('/me', authToken, getUserProfile);
 
 //Sua profile
-router.patch('/edit', (req, res) => {
-  res.send({
-    "error": {
-      "isError": false,
-      "errorMessage": {}
-    }
-  });
-});
+router.patch('/edit', authToken, changeUserProfile);
 
 //Lay tat ca users 
 //Chi admin

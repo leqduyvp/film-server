@@ -5,17 +5,8 @@ const findUserById = async (id) => {
   return User.findById(id);
 }
 
-const userSave = async (user) => {
-  if (!user._id) {
-    user.password = await bcrypt.hash(user.password, 8);
-    user.name = user.name.trim();
-    user.name = user.name.toLowerCase();
-  }
-  return new User(user).save();
-}
-
-const checkEmailExist = async (email) => {
-  return User.findOne({ email });
+const findUserByIdAndUpdate = (id, updates) => {
+  return User.findByIdAndUpdate(id, updates);
 }
 
 const findUserByCredentials = async (email, password) => {
@@ -42,9 +33,23 @@ const findUserByCredentials = async (email, password) => {
   return user;
 }
 
+const checkEmailExist = async (email) => {
+  return User.findOne({ email });
+}
+
+const userSave = async (user) => {
+  if (!user._id) {
+    user.password = await bcrypt.hash(user.password, 8);
+    user.name = user.name.trim();
+    user.name = user.name.toLowerCase();
+  }
+  return new User(user).save();
+}
+
 module.exports = {
   findUserById,
   userSave,
   checkEmailExist,
-  findUserByCredentials
+  findUserByCredentials,
+  findUserByIdAndUpdate
 }
