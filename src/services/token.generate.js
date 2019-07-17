@@ -26,7 +26,7 @@ module.exports = (userId, platform, res) => {
     };
 
     if (!token) {
-      const newToken = jwt.sign({ id: userId, device: platform }, secret, { expiresIn: '2h' });
+      const newToken = jwt.sign({ id: userId }, secret, { expiresIn: '2h' });
       response['access-token'] = newToken;
       client.setex(tokenKey, 7200, newToken.toString());
     } else {
