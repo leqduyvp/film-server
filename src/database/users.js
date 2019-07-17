@@ -1,16 +1,42 @@
 const User = require('./users.model');
 const bcrypt = require('bcryptjs');
 
+const userSave = async (user) => {
+  if (!user._id) {
+    user.password = await bcrypt.hash(user.password, 8);
+    user.name = user.name.trim();
+    user.name = user.name.toLowerCase();
+  }
+  return new User(user).save();
+}
+
 const getAllUser = async () => {
   const users = await User.find({}, { name: 1, email: 1 });
   return users;
 }
-const findUserById = async (id) => {
-  return User.findById(id);
-}
 
-const findUserByIdAndUpdate = (id, updates) => {
-  return User.findByIdAndUpdate(id, updates);
+const findUserById = async (id) => {
+  try {
+    const user = await User.findById(id);
+    if (!user) return {
+      error: {
+        isError: true,
+        errorMessage: {
+          database: 'User invalid'
+        }
+      }
+    }
+    return user;
+  } catch (err) {
+    return {
+      error: {
+        isError: true,
+        errorMessage: {
+          database: err.message
+        }
+      }
+    }
+  }
 }
 
 const findUserByCredentials = async (email, password) => {
@@ -19,7 +45,7 @@ const findUserByCredentials = async (email, password) => {
     error: {
       isError: true,
       errorMessage: {
-        credentials: 'Wrong email or password'
+        credentials: 'User invalid'
       }
     }
   }
@@ -41,13 +67,12 @@ const checkEmailExist = async (email) => {
   return User.findOne({ email });
 }
 
-const userSave = async (user) => {
-  if (!user._id) {
-    user.password = await bcrypt.hash(user.password, 8);
-    user.name = user.name.trim();
-    user.name = user.name.toLowerCase();
-  }
-  return new User(user).save();
+const findUserByIdAndUpdate = (id, updates) => {
+  return User.findByIdAndUpdate(id, updates);
+}
+
+const deleteUser = (_id) => {
+  return User.deleteOne({ _id });
 }
 
 module.exports = {
@@ -56,5 +81,6 @@ module.exports = {
   checkEmailExist,
   findUserByCredentials,
   findUserByIdAndUpdate,
-  getAllUser
+  getAllUser,
+  deleteUser
 }

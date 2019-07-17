@@ -8,6 +8,7 @@ const userLogout = require('../services/users.logout');
 const getUserProfile = require('../services/users.getProfile');
 const changeUserProfile = require('../services/users.changeProfile');
 const getAllUser = require('../services/users.getAll');
+const userDelete = require('../services/users.delete');
 //Dang Ky
 router.post('/register', userValid, userSave);
 
@@ -30,14 +31,7 @@ router.get('/', authToken, getAllUser);
 //Xoa user 
 // trung id trong token = tu xoa
 // hoac id trong token cua admin
-router.delete('/', (req, res) => {
-  res.send({
-    error: {
-      isError: false,
-      errorMessage: {}
-    }
-  });
-});
+router.delete('/', authToken, userDelete);
 
 //Lay phim da xem
 //List phim tra theo mang object
