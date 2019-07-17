@@ -5,8 +5,6 @@ module.exports = async (req, res, next) => {
     const user = await findUserById(req.userId);
     const userObject = user.toObject();
     delete userObject.password;
-    delete userObject._id;
-    delete userObject.__v;
     res.send({
       user: userObject,
       error: {

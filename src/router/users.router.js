@@ -7,6 +7,7 @@ const authToken = require('../services/token.auth');
 const userLogout = require('../services/users.logout');
 const getUserProfile = require('../services/users.getProfile');
 const changeUserProfile = require('../services/users.changeProfile');
+const getAllUser = require('../services/users.getAll');
 //Dang Ky
 router.post('/register', userValid, userSave);
 
@@ -24,22 +25,7 @@ router.patch('/edit', authToken, changeUserProfile);
 
 //Lay tat ca users 
 //Chi admin
-router.get('/', (req, res) => {
-  res.send({
-    error: {
-      isError: false,
-      errorMessage: {}
-    },
-    users: [{
-      name: 'XuanPhuc',
-      email: 'nguyenxuanphuc@gmail.com'
-    },
-    {
-      name: 'PhuTrong',
-      email: 'nguyenphutrong@gmail.com'
-    }]
-  });
-});
+router.get('/', authToken, getAllUser);
 
 //Xoa user 
 // trung id trong token = tu xoa

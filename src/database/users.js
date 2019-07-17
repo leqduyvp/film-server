@@ -1,6 +1,10 @@
 const User = require('./users.model');
 const bcrypt = require('bcryptjs');
 
+const getAllUser = async () => {
+  const users = await User.find({}, { name: 1, email: 1 });
+  return users;
+}
 const findUserById = async (id) => {
   return User.findById(id);
 }
@@ -51,5 +55,6 @@ module.exports = {
   userSave,
   checkEmailExist,
   findUserByCredentials,
-  findUserByIdAndUpdate
+  findUserByIdAndUpdate,
+  getAllUser
 }
