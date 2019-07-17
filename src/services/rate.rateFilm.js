@@ -1,5 +1,5 @@
 const { rateSave } = require('../database/rate');
-const { userSave } = require('../database/users');
+const { userSave, findUserById } = require('../database/users');
 
 async function calcNewRate(req, filmRate) {
   const checkRatedFilm = req.user.ratedFilms.filter((ratedFilm) => {
@@ -25,6 +25,7 @@ async function calcNewRate(req, filmRate) {
 
 module.exports = async (req, res, next) => {
   try {
+    req.user = await findUserById(req.userId);
     await calcNewRate(req, req.filmRate);
     res.status(201).send({
       error: {

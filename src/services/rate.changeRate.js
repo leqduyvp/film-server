@@ -19,8 +19,8 @@ async function calcNewRate(req, filmRate) {
 
 module.exports = async (req, res, next) => {
   try {
+    req.user = await findUserById(req.userId);
     await calcNewRate(req, req.filmRate);
-
     res.send({
       error: {
         isError: false,
