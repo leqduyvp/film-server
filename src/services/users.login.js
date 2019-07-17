@@ -18,7 +18,7 @@ const validCredentials = (req) => {
 module.exports = async (req, res, next) => {
   const invalid = validCredentials(req);
   if (invalid) {
-    return res.status(400).send(valid);
+    return res.status(400).send(invalid);
   }
   try {
     const user = await findUserByCredentials(req.body.email, req.body.password);

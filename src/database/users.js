@@ -1,5 +1,5 @@
 const User = require('./users.model');
-const brcypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 
 const findUserById = async (id) => {
   return User.findById(id);
@@ -7,7 +7,7 @@ const findUserById = async (id) => {
 
 const userSave = async (user) => {
   if (!user._id) {
-    user.password = await brcypt.hash(user.password, 8);
+    user.password = await bcrypt.hash(user.password, 8);
     user.name = user.name.trim();
     user.name = user.name.toLowerCase();
   }
@@ -45,5 +45,6 @@ const findUserByCredentials = async (email, password) => {
 module.exports = {
   findUserById,
   userSave,
-  checkEmailExist
+  checkEmailExist,
+  findUserByCredentials
 }
