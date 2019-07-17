@@ -1,4 +1,5 @@
 const { rateSave } = require('../database/rate');
+const { findUserById } = require('../database/users');
 
 async function calcNewRate(req, filmRate) {
   const checkRatedUser = filmRate.rates.findIndex((rateElement) => {
