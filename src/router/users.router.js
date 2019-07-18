@@ -9,6 +9,7 @@ const getUserProfile = require('../services/users.getProfile');
 const changeUserProfile = require('../services/users.changeProfile');
 const getAllUser = require('../services/users.getAll');
 const userDelete = require('../services/users.delete');
+const getWatchedFilms = require('../services/users.getWatchedFilms');
 //Dang Ky
 router.post('/register', userValid, userSave);
 
@@ -35,14 +36,6 @@ router.delete('/', authToken, userDelete);
 
 //Lay phim da xem
 //List phim tra theo mang object
-router.get('/watchFilms', (req, res) => {
-  res.send({
-    error: {
-      isError: false,
-      errorMessage: {}
-    },
-    watchedFilms: []
-  });
-});
+router.get('/watchFilms', authToken, getWatchedFilms);
 
 module.exports = router;

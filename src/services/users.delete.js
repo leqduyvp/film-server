@@ -52,5 +52,5 @@ module.exports = async (req, res, next) => {
     const deletedUser = await deleteUser(req.query.id);
     if (deletedUser.deletedCount) return sendSuccessResponse(res);
     else return userNotAvailableResponse(res);
-  } catch (err) { handleServerError(err, res); }
+  } catch (err) { return handleServerError(err, res); }
 }
