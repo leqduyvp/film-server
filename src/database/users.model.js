@@ -25,14 +25,10 @@ const UserSchema = new mongoose.Schema({
     default: Date.now(),
     required: true
   },
-  watchedFilms: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: false
-  },
   ratedFilms: [{
     filmId: {
       type: mongoose.Schema.Types.ObjectId,
-      require: false
+      require: true
     }
   }]
 });
