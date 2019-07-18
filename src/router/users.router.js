@@ -27,15 +27,26 @@ router.patch('/edit', authToken, changeUserProfile);
 
 //Lay tat ca users 
 //Chi admin
-router.get('/', authToken, getAllUser);
+//router.get('/', authToken, getAllUser);
 
 //Xoa user 
 // trung id trong token = tu xoa
 // hoac id trong token cua admin
-router.delete('/', authToken, userDelete);
+//router.delete('/', authToken, userDelete);
 
 //Lay phim da xem
 //List phim tra theo mang object
 router.get('/watchFilms', authToken, getWatchedFilms);
+
+router.all('/*', (req, res) => {
+  res.status(404).send({
+    error: {
+      isError: true,
+      errorMessage: {
+        server: 'Page not found'
+      }
+    }
+  })
+})
 
 module.exports = router;
