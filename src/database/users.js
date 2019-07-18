@@ -1,5 +1,6 @@
-const User = require('./users.model');
 const bcrypt = require('bcryptjs');
+const User = require('./users.model');
+const watchedFilms = require('./watchedFilms.model');
 
 const userSave = async (user) => {
   if (!user._id) {
@@ -71,7 +72,8 @@ const findUserByIdAndUpdate = (id, updates) => {
   return User.findByIdAndUpdate(id, updates);
 }
 
-const deleteUser = (_id) => {
+const deleteUser = async (_id) => {
+  await watchedFilms.deleteOne({ userId: _id });
   return User.deleteOne({ _id });
 }
 

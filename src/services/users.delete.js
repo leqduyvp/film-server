@@ -21,7 +21,7 @@ const sendSuccessResponse = (res) => {
 }
 
 const userNotAvailableResponse = (res) => {
-  return res.status(400).send({
+  res.status(400).send({
     error: {
       isError: true,
       errorMessage: {
@@ -33,9 +33,12 @@ const userNotAvailableResponse = (res) => {
 
 const deleteValid = async (req, res) => {
   const user = await findUserById(req.userId);
-  if (user.error) return userNotAvailableResponse(res);
+  if (user.error) {
+    userNotAvailableResponse(res);
+    return false;
+  }
   if (user._id != req.query.id && user.accType != 0) {
-    return res.status(400).send({
+    res.status(400).send({
       error: {
         isError: true,
         errorMessage: {
@@ -43,14 +46,17 @@ const deleteValid = async (req, res) => {
         }
       }
     });
+    return false;
   }
+  return true;
 }
 
 module.exports = async (req, res, next) => {
   try {
-    await deleteValid(req, res);
+    const valid = await deleteValid(req, res);
+    if (!valid) return;
     const deletedUser = await deleteUser(req.query.id);
     if (deletedUser.deletedCount) return sendSuccessResponse(res);
     else return userNotAvailableResponse(res);
-  } catch (err) { return handleServerError(err, res); }
+  } catch (err) { handleServerError(err, res); }
 }
