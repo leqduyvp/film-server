@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const watchedFilmsSchema = new mongoose.Schema({
+const WatchedFilmsSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true
@@ -29,5 +29,5 @@ const watchedFilmsSchema = new mongoose.Schema({
   }]
 });
 
-const watchedFilms = mongoose.model('watchedFilms', watchedFilmsSchema);
-module.exports = watchedFilms;
+const WatchedFilms = mongoose.model('watchedFilms', WatchedFilmsSchema);
+module.exports = WatchedFilms;

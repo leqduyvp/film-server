@@ -25,7 +25,7 @@ module.exports = (userId, platform = 'web', res) => {
     }
   };
   const newToken = jwt.sign({ id: userId, platform }, secret, { expiresIn: '2h' });
-  response['access-token'] = newToken;
+  response.accessToken = newToken;
   //client.setex(tokenKey, 7200, newToken.toString());
   res.send(response);
 }
