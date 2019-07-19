@@ -14,7 +14,13 @@ const validNormalUser = {
 const normalUserFilms = {
   _id: new mongoose.Types.ObjectId(),
   userId: validNormalUser._id,
-  films: []
+  films: [{
+    id: new mongoose.Types.ObjectId(),
+    title: 'Shazam(2019)',
+    episodeNumber: 1,
+    episodeNumberCurrent: 1,
+    thumb: 'asdf'
+  }]
 }
 
 const validAdminUser = {
