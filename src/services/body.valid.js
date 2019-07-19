@@ -20,7 +20,7 @@ const emailValidator = async (body, error) => {
 
 const accTypeValidator = async (body, error) => {
 
-  if (typeof body.accType == 'undefined') {
+  if (typeof body.accType === 'undefined') {
     error.isError = true;
     error.errorMessage.accType = 'Account Type is missing';
   }
@@ -30,7 +30,7 @@ const accTypeValidator = async (body, error) => {
     error.errorMessage.accType = "Invalid Account Type";
   }
 
-  if (body.accType == 0) {
+  if (body.accType === 0) {
     try {
       const id = jwt.verify(body.token, secret).id;
       const userFound = await findUserById(id);
@@ -53,7 +53,7 @@ const nameValidator = (body, error) => {
   body.name = body.name.trim();
   if (!body.name || body.name.length < 1 || body.name.length > 32) {
     error.isError = true;
-    if (!body.name) error.errorMessage.name = 'Name missing';
+    if (!body.name) error.errorMessage.name = 'Name is missing';
     else if (body.name.length < 1) error.errorMessage.name = 'Name is too short';
     else if (body.name.length > 32) error.errorMessage.name = 'Name is too long';
   }
@@ -62,8 +62,8 @@ const nameValidator = (body, error) => {
 const passwordValidator = (body, error) => {
   if (!body.password || body.password.length < 8) {
     error.isError = true;
-    if (!body.password) error.errorMessage.password = 'Password missing';
-    else if (body.password.length < 8) error.errorMessage.password = 'Password too short';
+    if (!body.password) error.errorMessage.password = 'Password is missing';
+    else if (body.password.length < 8) error.errorMessage.password = 'Password is too short';
   }
 }
 

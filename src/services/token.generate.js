@@ -4,7 +4,7 @@ const secret = require('../config/jwtSecret');
 
 // const client = redis.createClient();
 
-module.exports = (userId, platform, res) => {
+module.exports = (userId, platform = 'web', res) => {
   // const tokenKey = userId.toString() + '_' + platform.toString();
   // client.get(tokenKey, (err, token) => {
   //   if (err) {
