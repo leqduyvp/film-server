@@ -29,7 +29,7 @@ module.exports = async (req, res, next) => {
   }
   await validUpdates(updates, error);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
   try {
     if (updates.password) updates.password = await bcrypt.hash(updates.password, 8);
