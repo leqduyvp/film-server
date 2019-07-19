@@ -1,15 +1,18 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    trim: true
   },
   email: {
     type: String,
     unique: true,
     required: true,
-    index: true
+    index: true,
+    trim: true
   },
   password: {
     type: String,
@@ -24,16 +27,22 @@ const UserSchema = new mongoose.Schema({
     default: Date.now(),
     required: true
   },
-  watchedFilms: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: false
-  },
   ratedFilms: [{
     filmId: {
       type: mongoose.Schema.Types.ObjectId,
-      require: false
+      require: true
     }
   }]
+});
+
+UserSchema.pre('update', async function (next) {
+  const user = this;
+
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+
+  next();
 });
 
 const User = mongoose.model('User', UserSchema);

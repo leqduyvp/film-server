@@ -2,106 +2,51 @@ const express = require('express');
 const router = new express.Router();
 const userValid = require('../services/users.valid');
 const userSave = require('../services/users.save');
-
+const userLogin = require('../services/users.login');
+const authToken = require('../services/token.auth');
+const userLogout = require('../services/users.logout');
+const getUserProfile = require('../services/users.getProfile');
+const changeUserProfile = require('../services/users.changeProfile');
+const getAllUser = require('../services/users.getAll');
+const userDelete = require('../services/users.delete');
+const getWatchedFilms = require('../services/users.getWatchedFilms');
 //Dang Ky
 router.post('/register', userValid, userSave);
-//(req, res) => {
-//   res.send({
-//     error: {
-//       isError: false,
-//       errorMessage: {}
-//     }
-//   });
-// });
 
 //Dang nhap
-router.post('/login', (req, res) => {
-  res.send({
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZDI1OWUzZjI3OGE4NjMzZ" +
-      "jRiYzg3MDQiLCJpYXQiOjE1NjI4MzE3MDF9.e58bXnXQGQg9d-ep6FJ5sFqseLPKeZzLhDzGAAnbBE4",
-    "error": { "isError": false, "errorMessage": {} }
-  });
-});
+router.post('/login', userLogin);
 
 //Dang xuat
-router.post('/logout', (req, res) => {
-  res.send({
-    error: {
-      isError: false,
-      errorMessage: {}
-    }
-  });
-});
+router.post('/logout', authToken, userLogout);
 
 //Lay profile
-router.get('/me', (req, res) => {
-  res.send({
-    "error": {
-      "isError": false,
-      "errorMessage": {}
-    },
-    "user": {
-      "dateRegistered": "2019-07-10T08:13:40.824Z",
-      "watchedFilms": null,
-      "ratedFilms": [],
-      "email": "nguyenxuanphuc@gmail.com",
-      "name": "XuanPhuc",
-      "accType": 2
-    }
-  });
-});
+router.get('/me', authToken, getUserProfile);
 
 //Sua profile
-router.patch('/edit', (req, res) => {
-  res.send({
-    "error": {
-      "isError": false,
-      "errorMessage": {}
-    }
-  });
-});
+router.patch('/edit', authToken, changeUserProfile);
 
 //Lay tat ca users 
 //Chi admin
-router.get('/', (req, res) => {
-  res.send({
-    error: {
-      isError: false,
-      errorMessage: {}
-    },
-    users: [{
-      name: 'XuanPhuc',
-      email: 'nguyenxuanphuc@gmail.com'
-    },
-    {
-      name: 'PhuTrong',
-      email: 'nguyenphutrong@gmail.com'
-    }]
-  });
-});
+//router.get('/', authToken, getAllUser);
 
 //Xoa user 
 // trung id trong token = tu xoa
 // hoac id trong token cua admin
-router.delete('/', (req, res) => {
-  res.send({
-    error: {
-      isError: false,
-      errorMessage: {}
-    }
-  });
-});
+//router.delete('/', authToken, userDelete);
 
 //Lay phim da xem
 //List phim tra theo mang object
-router.get('/watchFilms', (req, res) => {
-  res.send({
+router.get('/watchFilms', authToken, getWatchedFilms);
+
+router.all('/*', (req, res) => {
+  res.status(404).send({
     error: {
-      isError: false,
-      errorMessage: {}
-    },
-    watchedFilms: []
-  });
-});
+      isError: true,
+      errorMessage: {
+        server: 'Page not found'
+      }
+    }
+  })
+})
 
 module.exports = router;

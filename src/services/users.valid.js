@@ -1,70 +1,10 @@
-const validator = require('validator');
-const jwt = require('jsonwebtoken');
-const { findUserById, checkEmailExist } = require('../database/users');
-const secret = require('../config/jwtSecret');
-
-const validEmail = async (user, error) => {
-  const isNewEmail = !(await checkEmailExist(user.email));
-
-  if (!user.email || !validator.isEmail(user.email)) {
-    error.isError = true;
-    error.errorMessage.email = 'Invalid email'
-  }
-
-  if (!isNewEmail) {
-    error.isError = true;
-    error.errorMessage.email = 'Email used'
-  }
-}
-
-const validAccType = async (user, error) => {
-
-  if (typeof user.accType == 'undefined') {
-    error.isError = true;
-    error.errorMessage.accType = 'Account Type is missing';
-  }
-
-  if (parseInt(user.accType) * 10 != user.accType * 10 || user.accType < 0 || user.accType > 2) {
-    error.isError = true;
-    error.errorMessage.accType = "Invalid Account Type";
-  }
-
-  if (user.accType == 0) {
-    try {
-      const id = jwt.verify(user.token, secret).id;
-      const userFound = await findUserById(id);
-      if (!userFound) {
-        error.isError = true;
-        error.errorMessage.token = 'Invalid token';
-      }
-      if (userFound.accType != 0) {
-        error.isError = true;
-        error.errorMessage.accType = 'Cannot create admin account';
-      }
-    } catch (e) {
-      error.isError = true;
-      error.errorMessage.accType = e.message;
-    }
-  }
-}
+const { emailValidator, nameValidator, passwordValidator, accTypeValidator } = require('./body.valid');
 
 const valid = async (user, error) => {
-  await validEmail(user, error);
-
-  if (!user.name || user.name.length < 1 || user.name.length > 32) {
-    error.isError = true;
-    if (!user.name) error.errorMessage.name = 'Name missing';
-    else if (user.name.length < 1) error.errorMessage.name = 'Name is too short';
-    else if (user.name.length > 32) error.errorMessage.name = 'Name is too long';
-  }
-
-  if (!user.password || user.password.length < 8) {
-    error.isError = true;
-    if (!user.password) error.errorMessage.password = 'Password missing';
-    else if (user.password.length < 8) error.errorMessage.password = 'Password too short';
-  }
-
-  await validAccType(user, error);
+  await emailValidator(user, error);
+  nameValidator(user, error);
+  passwordValidator(user, error);
+  await accTypeValidator(user, error);
 }
 
 module.exports = async (req, res, next) => {
