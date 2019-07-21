@@ -31,7 +31,7 @@ const findUserById = async (id) => {
         }
       }
       user = JSON.stringify(user);
-      client.setex(id.toString(), 60, user);
+      client.setex(id.toString(), 10, user);
     }
     return user;
   } catch (err) {

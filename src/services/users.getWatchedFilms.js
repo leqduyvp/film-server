@@ -2,7 +2,7 @@ const { getWatchedFilmsByUserId } = require('../database/watchedFilms');
 
 module.exports = async (req, res, next) => {
   try {
-    const { films } = await getWatchedFilmsByUserId(req.userId);
+    const { films } = JSON.parse(await getWatchedFilmsByUserId(req.userId));
     res.send({
       error: {
         isError: false,
