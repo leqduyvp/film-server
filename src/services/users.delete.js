@@ -32,7 +32,7 @@ const userNotAvailableResponse = (res) => {
 }
 
 const deleteValid = async (req, res) => {
-  const user = await findUserById(req.userId);
+  const user = JSON.parse(await findUserById(req.userId));
   if (user.error) {
     userNotAvailableResponse(res);
     return false;

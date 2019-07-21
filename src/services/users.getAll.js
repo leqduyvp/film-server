@@ -2,7 +2,7 @@ const { findUserById, getAllUser } = require('../database/users');
 
 module.exports = async (req, res, next) => {
   try {
-    const user = await findUserById(req.userId);
+    const user = JSON.parse(await findUserById(req.userId));
     if (user.error) return res.status(400).send(user);
     if (user.accType !== 0) {
       return res.status(400).send({

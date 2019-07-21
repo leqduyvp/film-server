@@ -19,7 +19,7 @@ test("Should update valid field", async () => {
     })
     .expect(200);
   expect(response.body.error.isError).toBeFalsy();
-  const user = await findUserById(validNormalUser._id);
+  const user = JSON.parse(await findUserById(validNormalUser._id));
   expect(user.name).toEqual('newname');
   expect(bcrypt.compareSync('newpassword', user.password)).toBeTruthy();
 });

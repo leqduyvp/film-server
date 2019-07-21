@@ -33,7 +33,7 @@ const accTypeValidator = async (body, error) => {
   if (body.accType === 0) {
     try {
       const id = jwt.verify(body.token, secret).id;
-      const userFound = await findUserById(id);
+      const userFound = JSON.parse(await findUserById(id));
       if (!userFound) {
         error.isError = true;
         error.errorMessage.token = 'Invalid token';
