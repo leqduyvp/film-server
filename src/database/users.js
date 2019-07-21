@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('./users.model');
 const watchedFilms = require('./watchedFilms.model');
+const client = require('./cache.connection');
 
 const userSave = async (user) => {
   if (!user._id) {
@@ -18,14 +19,19 @@ const getAllUser = async () => {
 
 const findUserById = async (id) => {
   try {
-    const user = await User.findById(id);
-    if (!user) return {
-      error: {
-        isError: true,
-        errorMessage: {
-          database: 'User invalid'
+    let user = await client.getAsync(id.toString());
+    if (!user) {
+      user = await User.findById(id);
+      if (!user) return {
+        error: {
+          isError: true,
+          errorMessage: {
+            database: 'User invalid'
+          }
         }
       }
+      user = JSON.stringify(user);
+      client.setex(id.toString(), 60, user);
     }
     return user;
   } catch (err) {

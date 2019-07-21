@@ -4,7 +4,7 @@ module.exports = async (req, res, next) => {
   try {
     const user = await findUserById(req.userId);
     if (user.error) return res.status(400).send(user);
-    const userObject = user.toObject();
+    const userObject = JSON.parse(user);
     delete userObject.password;
     res.send({
       user: userObject,
