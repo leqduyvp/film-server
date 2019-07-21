@@ -19,7 +19,7 @@ const getAllUser = async () => {
 
 const findUserById = async (id) => {
   try {
-    let user = await client.getAsync(id.toString());
+    let user = await client.getAsync(id.toString() + '_user');
     if (!user) {
       user = await User.findById(id);
       if (!user) return {
@@ -31,7 +31,7 @@ const findUserById = async (id) => {
         }
       }
       user = JSON.stringify(user);
-      client.setex(id.toString(), 10, user);
+      client.setex(id.toString() + '_user', 10, user);
     }
     return user;
   } catch (err) {
@@ -74,7 +74,12 @@ const checkEmailExist = async (email) => {
   return User.findOne({ email });
 }
 
-const findUserByIdAndUpdate = (id, updates) => {
+const findUserByIdAndUpdate = async (id, updates) => {
+  let user = JSON.parse(await findUserById(id));
+  for (let key in updates) {
+    user[key] = updates[key];
+  }
+  client.setex(id.toString() + '_user', 10, JSON.stringify(user));
   return User.findByIdAndUpdate(id, updates);
 }
 
