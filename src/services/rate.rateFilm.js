@@ -1,23 +1,26 @@
 const { rateSave } = require('../database/rate');
 const { userSave, findUserById } = require('../database/users');
 
-async function calcNewRate(req, filmRate) {
-  const checkRatedFilm = req.user.ratedFilms.filter((ratedFilm) => {
-    return (ratedFilm.filmId.toString() == filmRate.filmId.toString());
+async function calcNewRate(req) {
+  const filmRate = req.filmRate;
+  const checkRatedFilm = filmRate.rates.findIndex((rateValue) => {
+    return (rateValue.userId.toString() === req.user._id.toString());
   });
 
-  if (checkRatedFilm.length) {
-    throw new Error('This film is rated by current user');
+  if (checkRatedFilm === -1) {
+    filmRate.rates.push({
+      userId: req.user._id,
+      rating: req.body.rate
+    });
+    req.user.ratedFilms.push({ filmId: filmRate.filmId });
   }
+  else filmRate.rates[checkRatedFilm].rating = req.body.rate;
 
-  const userRated = filmRate.rates.length;
-  filmRate.ratingNumber = ((filmRate.ratingNumber * userRated) + req.body.rate) / (userRated + 1);
-  filmRate.rates.push({
-    userId: req.user._id,
-    rating: req.body.rate
+  let newRate = 0;
+  filmRate.rates.forEach((rateValue) => {
+    newRate += rateValue.rating;
   });
-
-  req.user.ratedFilms.push({ filmId: filmRate.filmId });
+  filmRate.ratingNumber = newRate / filmRate.rates.length;
 
   await userSave(req.user);
   await rateSave(filmRate);
@@ -26,7 +29,7 @@ async function calcNewRate(req, filmRate) {
 module.exports = async (req, res, next) => {
   try {
     req.user = await findUserById(req.userId);
-    await calcNewRate(req, req.filmRate);
+    await calcNewRate(req);
     res.status(201).send({
       error: {
         isError: false,
