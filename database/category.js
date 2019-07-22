@@ -5,13 +5,17 @@ const getAllCategories = () => {
   return Category.find({});
 }
 
-const addCategory = (key, values) => {
-  const category = new Category({ key, values });
+const addCategory = (parentCategory, childrenCategories) => {
+  const category = new Category({
+    parentCategory,
+    childrenCategories
+  });
+
   return category.save();
 }
 
-const updateCategory = (id, key, values) => {
-  return Category.findByIdAndUpdate(id, {key, values});
+const updateCategory = (id, parentCategory, childrenCategories) => {
+  return Category.findByIdAndUpdate(id, {parentCategory, childrenCategories});
 }
 
 const deleteCategory = id => {

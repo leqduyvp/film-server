@@ -3,7 +3,6 @@ const redis = require('redis');
 const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
 const { getAllCategoriesFromCache, setAllCategoriesToCache } = require('../service/category.cache');
 const { getAllCategories, addCategory, updateCategory, deleteCategory } = require('../database/category');
-const { checkString } = require('../utils/checkString');
 
 // Create Redis Client
 const client = redis.createClient({
@@ -16,86 +15,6 @@ const client = redis.createClient({
 client.on('error', error => {
   console.log(error.message);
 });
-
-const checkIdService = id => {
-  let error = {
-    isError: false,
-    errorMessage: {}
-  }
-
-  const err = checkString(id);
-
-  if (err.isError) {
-    error.isError = true;
-    error.errorMessage.id = 'id ' + err.message;
-
-    return error;
-  }
-
-  return error;
-}
-
-const checkInputService = (key, values) => {
-  let error = {
-    isError: false,
-    errorMessage: {}
-  }
-
-  const checkKey = checkString(key);
-
-  if (checkKey.isError) {
-    error.isError = true;
-    error.errorMessage.key = 'key ' + checkKey.message;
-
-    return error;
-  }
-
-  if (values === undefined || values === null) {
-    // Uncomment to not Alow values undefined or null
-    // error.isError = true;
-    // error.errorMessage.values = 'values is required';
-
-    return error;
-  }
-
-  if (!(values instanceof Array)) {
-    error.isError = true;
-    error.errorMessage.values = 'values must be an array';
-
-    return error;
-  }
-
-  const numberValues = values.length;
-  for (let i = 0; i < numberValues; i++) {
-    const checkValue = checkString(values[i]);
-    if (checkValue.isError) {
-      error.isError = true;
-      error.errorMessage.values = `values[${i}] ` + checkValue.message;
-
-      return error;
-    }
-  }
-
-  return error;
-}
-
-const trimAndToLowerCase = str => {
-  return str.trim().toLowerCase();
-}
-
-const changeInputService = (key, values) => {
-  const changedKey = trimAndToLowerCase(key);
-  let changedValues = null;
-
-  if (values !== undefined && values !== null) {
-    changedValues = values.map(value => trimAndToLowerCase(value));
-  }
-
-  return {
-    changedKey,
-    changedValues
-  }
-}
 
 const getAllCategoriesService = async () => {
   let error = {
@@ -134,14 +53,14 @@ const getAllCategoriesService = async () => {
   }
 }
 
-const addCategoryService = async (key, values) => {
+const addCategoryService = async (parentCategory, childrenCategories) => {
   let error = {
     isError: false,
     errorMessage: {}
   }
 
   try {
-    await addCategory(key, values);
+    await addCategory(parentCategory, childrenCategories);
 
     // Update in cache
 
@@ -154,7 +73,7 @@ const addCategoryService = async (key, values) => {
   }
 }
 
-const updateCategoryService = async (id, key, values) => {
+const updateCategoryService = async (id, parentCategory, childrenCategories) => {
   let error = {
     isError: false,
     errorMessage: {}
@@ -163,7 +82,7 @@ const updateCategoryService = async (id, key, values) => {
   try {
     // Store data to database
     console.log('Update')
-    await updateCategory(id, key, values);
+    await updateCategory(id, parentCategory, childrenCategories);
 
     // Update data in cache
 
@@ -198,9 +117,6 @@ const deleteCategoryService = async id => {
 }
 
 module.exports = {
-  checkInputService,
-  checkIdService,
-  changeInputService,
   getAllCategoriesService,
   addCategoryService,
   updateCategoryService,
