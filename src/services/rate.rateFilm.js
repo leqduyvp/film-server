@@ -30,7 +30,7 @@ module.exports = async (req, res, next) => {
   try {
     req.user = await findUserById(req.userId);
     await calcNewRate(req);
-    res.status(201).send({
+    res.status(200).send({
       error: {
         isError: false,
         errorMessage: {}

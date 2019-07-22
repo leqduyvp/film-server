@@ -1,26 +1,41 @@
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
-const { setupDatabase, userRate, rateFilm } = require('./rate.dataInit');
+const { setupDatabase, userRate, userRateInit, rateFilm } = require('./rate.dataInit');
 const { getRateByFilmId } = require('../database/rate');
 const app = require('../app');
 
 beforeEach(setupDatabase);
 
 const userToken = jwt.sign({ id: userRate._id, platform: 'web' }, secret, { expiresIn: '2h' });
+const userRatedToken = jwt.sign({ id: userRateInit._id, platform: 'web' }, secret, { expiresIn: '2h' });
 
 test('Should rate film for user', async () => {
   const response = await request(app).post('/rate')
     .query({ filmId: rateFilm.filmId })
     .set('access-token', userToken)
     .send({
-      rate: 5
+      rate: 3
     })
-    .expect(201);
+    .expect(200);
 
   expect(response.body.error.isError).toBeFalsy();
   const newRate = await getRateByFilmId(rateFilm.filmId);
-  expect(newRate.ratingNumber).toBe(5);
+  expect(newRate.ratingNumber).toBe(4);
+});
+
+test('Should change rate for rated user', async () => {
+  const response = await request(app).post('/rate')
+    .query({ filmId: rateFilm.filmId })
+    .set('access-token', userRatedToken)
+    .send({
+      rate: 4
+    })
+    .expect(200);
+
+  expect(response.body.error.isError).toBeFalsy();
+  const newRate = await getRateByFilmId(rateFilm.filmId);
+  expect(newRate.ratingNumber).toBe(4);
 });
 
 test('Should not rate film for invalid user', async () => {
