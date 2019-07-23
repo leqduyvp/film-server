@@ -81,17 +81,21 @@ const checkPhoneExist = (phone) => {
 }
 
 const findUserByIdAndUpdate = async (id, updates) => {
-  let user = JSON.parse(await findUserById(id));
+  const user = await User.findById(id);
   for (let key in updates) {
     user[key] = updates[key];
   }
   client.setex(id.toString() + '_user', 10, JSON.stringify(user));
-  return User.findByIdAndUpdate(id, updates);
+  return user.save();
 }
 
 const deleteUser = async (_id) => {
   await watchedFilms.deleteOne({ userId: _id });
   return User.deleteOne({ _id });
+}
+
+const userOtpSave = (userId, otp) => {
+  client.setex(userId.toString() + '_otp', 300, otp);
 }
 
 module.exports = {
@@ -102,5 +106,6 @@ module.exports = {
   findUserByIdAndUpdate,
   getAllUser,
   deleteUser,
-  checkPhoneExist
+  checkPhoneExist,
+  userOtpSave
 }

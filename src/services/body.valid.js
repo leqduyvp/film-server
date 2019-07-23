@@ -6,16 +6,23 @@ const secret = require('../config/jwtSecret');
 
 const emailValidator = async (body, error) => {
   body.email = body.email.trim();
-  const isNewEmail = !(await checkEmailExist(body.email));
+  const emailUsed = await checkEmailExist(body.email);
 
   if (!body.email || !validator.isEmail(body.email)) {
     error.isError = true;
     error.errorMessage.email = 'Invalid email'
   }
 
-  if (!isNewEmail) {
+  if (emailUsed) {
     error.isError = true;
-    error.errorMessage.email = 'Email used'
+    error.errorMessage.email = 'Email used';
+    if (emailUsed.activated) return;
+    for (let key in body) {
+      if (body[key] != emailUsed[key]) {
+        error.edit = emailUsed._id;
+        return;
+      }
+    }
   }
 }
 
@@ -84,6 +91,13 @@ const phoneValidator = async (body, error) => {
   if (phoneUsed) {
     error.isError = true;
     error.errorMessage.phone = 'Phone number used';
+    if (phoneUsed.activated) return;
+    for (let key in body) {
+      if (body[key] != phoneUsed[key]) {
+        error.edit = phoneUsed._id;
+        return;
+      }
+    }
   }
 }
 

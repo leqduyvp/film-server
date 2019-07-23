@@ -13,6 +13,11 @@ module.exports = async (req, res, next) => {
     const error = { isError: false, errorMessage: {} };
     if (req.header('access-token')) req.body.token = req.header('access-token');
     await valid(req.body, error);
+    if (error.edit) {
+      req.edit = error.edit;
+      next();
+      return;
+    }
     if (error.isError) {
       return res.status(400).send({ error });
     }

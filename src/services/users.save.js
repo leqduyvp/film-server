@@ -1,20 +1,25 @@
 const phone = require('phone');
-const { userSave } = require('../database/users');
+const { userSave, findUserByIdAndUpdate } = require('../database/users');
 const { watchedFilmsSave } = require('../database/watchedFilms');
+const otpGenerate = require('./otp.generate');
 
 module.exports = async (req, res) => {
   try {
     req.body.phone = phone(req.body.phone, 'VNM')[0];
-    req.body.activated = 0;
-    const user = await userSave(req.body);
+    req.body.activated = false;
+    let user = {};
 
-    await watchedFilmsSave({
-      userId: user._id,
-      films: []
-    });
+    if (req.edit) user = await findUserByIdAndUpdate(req.edit, req.body);
+    else {
+      user = await userSave(req.body);
 
+      await watchedFilmsSave({
+        userId: user._id,
+        films: []
+      });
+    }
 
-
+    otpGenerate(user._id);
     res.status(201).send({
       error: {
         isError: false,
