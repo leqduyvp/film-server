@@ -98,6 +98,10 @@ const userOtpSave = (userId, otp) => {
   client.setex(userId.toString() + '_otp', 300, otp);
 }
 
+const findUserOtp = async (userId) => {
+  return await client.getAsync(userId.toString() + '_otp');
+}
+
 module.exports = {
   findUserById,
   userSave,
@@ -107,5 +111,6 @@ module.exports = {
   getAllUser,
   deleteUser,
   checkPhoneExist,
-  userOtpSave
+  userOtpSave,
+  findUserOtp
 }

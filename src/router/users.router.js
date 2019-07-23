@@ -10,8 +10,12 @@ const changeUserProfile = require('../services/users.changeProfile');
 const getAllUser = require('../services/users.getAll');
 const userDelete = require('../services/users.delete');
 const getWatchedFilms = require('../services/users.getWatchedFilms');
+const userActivate = require('../services/users.activate');
 //Dang Ky
 router.post('/register', userValid, userSave);
+
+//Active
+router.post('/activate', userActivate);
 
 //Dang nhap
 router.post('/login', userLogin);
