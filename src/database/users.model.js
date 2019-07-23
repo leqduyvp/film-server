@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema({
     required: true
   },
   activated: {
-    type: Number,
+    type: Boolean,
     required: true
   },
   dateRegistered: {

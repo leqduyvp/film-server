@@ -11,7 +11,7 @@ const validNormalUser = {
   password: bcrypt.hashSync('validuser', 8),
   phone: phone('0912345678', 'VNM')[0],
   accType: 2,
-  activated: 1
+  activated: true
 }
 
 const normalUserFilms = {
@@ -33,7 +33,7 @@ const validAdminUser = {
   phone: phone('0934567890','VNM')[0],
   password: bcrypt.hashSync('validamin', 8),
   accType: 0,
-  activated: 1
+  activated: true
 }
 
 const adminUserFilms = {
