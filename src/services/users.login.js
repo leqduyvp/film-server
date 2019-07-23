@@ -1,19 +1,18 @@
+const phone = require('phone');
 const { findUserByCredentials } = require('../database/users');
 const generateToken = require('../services/token.generate');
 
 const validCredentials = (req) => {
-  if (!req.body.email || !req.body.password)
+  if ((!req.body.email && !req.body.phone) || !req.body.password)
     return {
       error: {
         isError: true,
         errorMessage: {
-          credentials: 'Email or password is missing'
+          credentials: 'Username or password is missing'
         }
       }
     };
 }
-
-
 
 module.exports = async (req, res, next) => {
   const invalid = validCredentials(req);
@@ -21,7 +20,12 @@ module.exports = async (req, res, next) => {
     return res.status(400).send(invalid);
   }
   try {
-    const user = await findUserByCredentials(req.body.email, req.body.password);
+    let loginUsername = '';
+    if(!req.body.email) loginUsername = 'phone';
+    else loginUsername = 'email';
+
+    req.body.phone = phone(req.body.phone, 'VNM');
+    const user = await findUserByCredentials(req.body, loginUsername);
     if (user.error) {
       return res.status(400).send({ error: user.error });
     }

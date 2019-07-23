@@ -18,7 +18,7 @@ test('Should sign up valid normal user', async () => {
     })
     .expect(201);
   expect(response.body.error.isError).toBeFalsy();
-  const user = await findUserByCredentials('anhhung@gmail.com', 'anhhung123');
+  const user = await findUserByCredentials({email: 'anhhung@gmail.com', password: 'anhhung123'},  'email');
   expect(user.error).toBeFalsy();
 });
 
@@ -73,7 +73,7 @@ test('Should sign up valid admin user', async () => {
     })
     .expect(201);
   expect(response.body.error.isError).toBeFalsy();
-  const user = await findUserByCredentials('anhno@gmail.com', 'anhno123');
+  const user = await findUserByCredentials({email: 'anhno@gmail.com', password: 'anhno123'}, 'email');
   expect(user.error).toBeFalsy();
 });
 

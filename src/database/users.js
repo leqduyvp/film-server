@@ -46,8 +46,10 @@ const findUserById = async (id) => {
   }
 }
 
-const findUserByCredentials = async (email, password) => {
-  const user = await User.findOne({ email });
+const findUserByCredentials = async (credentials, loginUsername) => {
+  let queryObj = {};
+  queryObj[loginUsername] = credentials[loginUsername];
+  const user = await User.findOne(queryObj);
   if (!user) return {
     error: {
       isError: true,
@@ -57,12 +59,12 @@ const findUserByCredentials = async (email, password) => {
     }
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await bcrypt.compare(credentials.password, user.password);
   if (!isMatch) return {
     error: {
       isError: true,
       errorMessage: {
-        credentials: 'Wrong email or password'
+        credentials: 'Wrong credentials'
       }
     }
   }
