@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  activated: {
+    type: Number,
+    required: true
+  },
   dateRegistered: {
     type: Date,
     default: Date.now(),

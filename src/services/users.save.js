@@ -5,12 +5,15 @@ const { watchedFilmsSave } = require('../database/watchedFilms');
 module.exports = async (req, res) => {
   try {
     req.body.phone = phone(req.body.phone, 'VNM')[0];
+    req.body.activated = 0;
     const user = await userSave(req.body);
 
     await watchedFilmsSave({
       userId: user._id,
       films: []
     });
+
+
 
     res.status(201).send({
       error: {
