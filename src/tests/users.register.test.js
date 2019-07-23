@@ -13,6 +13,7 @@ test('Should sign up valid normal user', async () => {
       email: 'anhhung@gmail.com',
       name: 'anh Hung',
       password: 'anhhung123',
+      phone: '0945417512',
       accType: 2
     })
     .expect(201);
@@ -63,6 +64,7 @@ test('Should sign up valid admin user', async () => {
       email: 'anhno@gmail.com',
       name: 'anh No',
       password: 'anhno123',
+      phone: '0978546812',
       accType: 0
     })
     .expect(201);

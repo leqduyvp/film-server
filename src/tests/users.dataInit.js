@@ -8,6 +8,7 @@ const validNormalUser = {
   email: 'validUser@valid.com',
   name: 'validUser',
   password: bcrypt.hashSync('validuser', 8),
+  phone: '0912345678',
   accType: 2
 }
 
@@ -27,6 +28,7 @@ const validAdminUser = {
   _id: new mongoose.Types.ObjectId(),
   email: 'validAdmin@valid.com',
   name: 'validAdmin',
+  phone: '0934567890',
   password: bcrypt.hashSync('validamin', 8),
   accType: 0
 }
