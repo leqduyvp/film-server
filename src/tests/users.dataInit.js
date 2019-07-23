@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const phone = require('phone');
 const User = require('../database/users.model');
 const WatchedFilms = require('../database/watchedFilms.model');
 
@@ -8,7 +9,7 @@ const validNormalUser = {
   email: 'validUser@valid.com',
   name: 'validUser',
   password: bcrypt.hashSync('validuser', 8),
-  phone: '0912345678',
+  phone: phone('0912345678', 'VNM')[0],
   accType: 2
 }
 
@@ -28,7 +29,7 @@ const validAdminUser = {
   _id: new mongoose.Types.ObjectId(),
   email: 'validAdmin@valid.com',
   name: 'validAdmin',
-  phone: '0934567890',
+  phone: phone('0934567890','VNM')[0],
   password: bcrypt.hashSync('validamin', 8),
   accType: 0
 }

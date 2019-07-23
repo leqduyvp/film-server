@@ -74,6 +74,10 @@ const checkEmailExist = async (email) => {
   return User.findOne({ email });
 }
 
+const checkPhoneExist = (phone) => {
+  return User.findOne({ phone });
+}
+
 const findUserByIdAndUpdate = async (id, updates) => {
   let user = JSON.parse(await findUserById(id));
   for (let key in updates) {
@@ -95,5 +99,6 @@ module.exports = {
   findUserByCredentials,
   findUserByIdAndUpdate,
   getAllUser,
-  deleteUser
+  deleteUser,
+  checkPhoneExist
 }

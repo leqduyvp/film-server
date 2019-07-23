@@ -1,6 +1,7 @@
 const validator = require('validator');
+const phone = require('phone');
 const jwt = require('jsonwebtoken');
-const { findUserById, checkEmailExist } = require('../database/users');
+const { findUserById, checkEmailExist, checkPhoneExist } = require('../database/users');
 const secret = require('../config/jwtSecret');
 
 const emailValidator = async (body, error) => {
@@ -67,9 +68,29 @@ const passwordValidator = (body, error) => {
   }
 }
 
+const phoneValidator = async (body, error) => {
+  if (!body.phone) {
+    error.isError = true;
+    error.errorMessage.phone = 'Invalid phone number';
+  }
+
+  const valid = phone(body.phone, 'VNM');
+  if (!valid.length) {
+    error.isError = true;
+    error.errorMessage.phone = 'Invalid phone number';
+  }
+
+  const phoneUsed = await checkPhoneExist(valid[0]);
+  if (phoneUsed) {
+    error.isError = true;
+    error.errorMessage.phone = 'Phone number used';
+  }
+}
+
 module.exports = {
   emailValidator,
   passwordValidator,
   accTypeValidator,
-  nameValidator
+  nameValidator,
+  phoneValidator
 }

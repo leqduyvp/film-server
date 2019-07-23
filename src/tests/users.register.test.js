@@ -27,6 +27,7 @@ test('Should not sign up invalid user 1', async () => {
     .send({
       email: '@gmail.com',
       name: '',
+      phone: '123',
       password: 'qwe'
     })
     .expect(400);
@@ -35,7 +36,8 @@ test('Should not sign up invalid user 1', async () => {
     email: 'Invalid email',
     name: 'Name is missing',
     password: 'Password is too short',
-    accType: 'Invalid Account Type'
+    accType: 'Invalid Account Type',
+    phone: 'Invalid phone number'
   });
 });
 
@@ -44,6 +46,7 @@ test('Should not sign up invalid user 2', async () => {
     .send({
       email: validNormalUser.email,
       name: 'longlonglonglonglonglonglonglonglonglonglonglonglong',
+      phone: '0912345678',
       password: '',
       accType: 2.3
     })
@@ -53,7 +56,8 @@ test('Should not sign up invalid user 2', async () => {
     email: 'Email used',
     name: 'Name is too long',
     password: 'Password is missing',
-    accType: 'Invalid Account Type'
+    accType: 'Invalid Account Type',
+    phone: 'Phone number used'
   })
 });
 
@@ -80,6 +84,7 @@ test('Should not sign up admin user with false token (wrong secret)', async () =
       email: 'anonymous@gmail.com',
       name: 'Anony',
       password: 'anonymous',
+      phone: '0961458921',
       accType: 0
     })
     .expect(400);
@@ -93,6 +98,7 @@ test('Shoud not sign up admin user with false token (normal user)', async () => 
       email: 'anonymous@gmail.com',
       name: 'Anony',
       password: 'anonymous',
+      phone: '0961458921',
       accType: 0
     })
     .expect(400);

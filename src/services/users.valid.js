@@ -1,10 +1,11 @@
-const { emailValidator, nameValidator, passwordValidator, accTypeValidator } = require('./body.valid');
+const { emailValidator, nameValidator, passwordValidator, accTypeValidator, phoneValidator } = require('./body.valid');
 
 const valid = async (user, error) => {
   await emailValidator(user, error);
   nameValidator(user, error);
   passwordValidator(user, error);
   await accTypeValidator(user, error);
+  await phoneValidator(user, error);
 }
 
 module.exports = async (req, res, next) => {
