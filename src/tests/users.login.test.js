@@ -1,7 +1,7 @@
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
-const { setupDatabase, validAdminUser, validNormalUser } = require('./users.dataInit');
+const { setupDatabase, notActivatedUser, validNormalUser } = require('./users.dataInit');
 const app = require('../app');
 
 beforeEach(setupDatabase);
@@ -34,7 +34,7 @@ test('Should log in for valid user with phone', async () => {
   expect(jwt.verify(token, secret).id.toString()).toEqual(validNormalUser._id.toString());
 });
 
-test('Should not log in for wrong credentials(password) ', async () => {
+test('Should not log in with wrong credentials(password) ', async () => {
   const response = await request(app).post('/users/login')
     .send({
       email: validNormalUser.email,
@@ -48,7 +48,7 @@ test('Should not log in for wrong credentials(password) ', async () => {
   });
 });
 
-test('Should not log in for wrong credentials(email) ', async () => {
+test('Should not log in with wrong credentials(email) ', async () => {
   const response = await request(app).post('/users/login')
     .send({
       email: 'invaliduser@valid.com',
@@ -62,7 +62,7 @@ test('Should not log in for wrong credentials(email) ', async () => {
   });
 });
 
-test('Should not log in for wrong credentials(phone) ', async () => {
+test('Should not log in with wrong credentials(phone) ', async () => {
   const response = await request(app).post('/users/login')
     .send({
       phone: '0961458641',
@@ -74,4 +74,15 @@ test('Should not log in for wrong credentials(phone) ', async () => {
   expect(response.body.error.errorMessage).toMatchObject({
     credentials: 'User invalid'
   });
+});
+
+test('Should not log in not activated account', async () => {
+  const response = await request(app).post('/users/login')
+    .send({
+      email: notActivatedUser.email,
+      password: 'unactivated'
+    })
+    .expect(400);
+  expect(response.body.error.isError).toBeTruthy();
+  expect(response.body.userId).toEqual(notActivatedUser._id.toString());
 });
