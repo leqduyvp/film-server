@@ -82,6 +82,7 @@ const checkPhoneExist = (phone) => {
 
 const findUserByIdAndUpdate = async (id, updates) => {
   const user = await User.findById(id);
+  if(updates.password) updates.password = await bcrypt.hash(updates.password, 8);
   for (let key in updates) {
     user[key] = updates[key];
   }

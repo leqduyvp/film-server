@@ -1,8 +1,8 @@
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
-const { setupDatabase, validAdminUser, validNormalUser } = require('./users.dataInit');
-const { findUserByCredentials } = require('../database/users');
+const { setupDatabase, validAdminUser, validNormalUser, notActivatedUser } = require('./users.dataInit');
+const { findUserByCredentials, findUserOtp } = require('../database/users');
 const app = require('../app');
 
 beforeEach(setupDatabase);
@@ -18,8 +18,10 @@ test('Should sign up valid normal user', async () => {
     })
     .expect(201);
   expect(response.body.error.isError).toBeFalsy();
-  const user = await findUserByCredentials({email: 'anhhung@gmail.com', password: 'anhhung123'},  'email');
+  const user = await findUserByCredentials({ email: 'anhhung@gmail.com', password: 'anhhung123' }, 'email');
   expect(user.error).toBeFalsy();
+  const otp = await findUserOtp(user._id);
+  expect(otp).toBeTruthy();  
 });
 
 test('Should not sign up invalid user 1', async () => {
@@ -73,7 +75,7 @@ test('Should sign up valid admin user', async () => {
     })
     .expect(201);
   expect(response.body.error.isError).toBeFalsy();
-  const user = await findUserByCredentials({email: 'anhno@gmail.com', password: 'anhno123'}, 'email');
+  const user = await findUserByCredentials({ email: 'anhno@gmail.com', password: 'anhno123' }, 'email');
   expect(user.error).toBeFalsy();
 });
 
@@ -106,4 +108,49 @@ test('Shoud not sign up admin user with false token (normal user)', async () => 
   expect(response.body.error.errorMessage).toMatchObject({
     accType: 'Cannot create admin account'
   });
-})
+});
+
+test('Should change profile for user who has not activated yet(reuse email)', async () => {
+  const response = await request(app).post('/users/register')
+    .send({
+      email: notActivatedUser.email,
+      name: 'newname',
+      password: 'newpassword',
+      phone: '0976341527',
+      accType: 2
+    })
+    .expect(201);
+  expect(response.body.error.isError).toBeFalsy();
+  const user = await findUserByCredentials({ email: notActivatedUser.email, password: 'newpassword' }, 'email');
+  expect(user.name).toBe('newname');
+});
+
+test('Should change profile for user who has not activated yet(reuse phone)', async () => {
+  const response = await request(app).post('/users/register')
+    .send({
+      email: 'newemail@valid.com',
+      name: 'newname',
+      password: 'newpassword',
+      phone: notActivatedUser.phone,
+      accType: 2
+    })
+    .expect(201);
+  expect(response.body.error.isError).toBeFalsy();
+  const user = await findUserByCredentials({ phone: notActivatedUser.phone, password: 'newpassword' }, 'phone');
+  expect(user.name).toBe('newname');
+});
+
+test('Should not change profile for activated user', async () => {
+  const response = await request(app).post('/users/register')
+    .send({
+      email: validNormalUser.email,
+      name: 'newname',
+      password: 'newpassword',
+      phone: validNormalUser.phone,
+      accType: 2
+    })
+    .expect(400);
+  expect(response.body.error.isError).toBeTruthy();
+});
+
+

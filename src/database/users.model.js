@@ -46,16 +46,6 @@ const UserSchema = new mongoose.Schema({
   }]
 });
 
-UserSchema.pre('update', async function (next) {
-  const user = this;
-
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 8);
-  }
-
-  next();
-});
-
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User;

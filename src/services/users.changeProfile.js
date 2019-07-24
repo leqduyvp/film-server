@@ -32,7 +32,7 @@ module.exports = async (req, res, next) => {
     return res.status(400).send({ error });
   }
   try {
-    if (updates.password) updates.password = await bcrypt.hash(updates.password, 8);
+    // if (updates.password) updates.password = await bcrypt.hash(updates.password, 8);
     await findUserByIdAndUpdate(req.userId, updates);
     res.send({
       error: {

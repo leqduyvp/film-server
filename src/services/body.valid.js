@@ -5,14 +5,14 @@ const { findUserById, checkEmailExist, checkPhoneExist } = require('../database/
 const secret = require('../config/jwtSecret');
 
 const emailValidator = async (body, error) => {
-  body.email = body.email.trim();
+
   const emailUsed = await checkEmailExist(body.email);
 
   if (!body.email || !validator.isEmail(body.email)) {
     error.isError = true;
     error.errorMessage.email = 'Invalid email'
   }
-
+  body.email = body.email.trim();
   if (emailUsed) {
     error.isError = true;
     error.errorMessage.email = 'Email used';

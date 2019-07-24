@@ -30,7 +30,7 @@ const validAdminUser = {
   _id: new mongoose.Types.ObjectId(),
   email: 'validAdmin@valid.com',
   name: 'validAdmin',
-  phone: phone('0934567890','VNM')[0],
+  phone: phone('0934567890', 'VNM')[0],
   password: bcrypt.hashSync('validamin', 8),
   accType: 0,
   activated: true
@@ -42,6 +42,22 @@ const adminUserFilms = {
   films: []
 }
 
+const notActivatedUser = {
+  _id: new mongoose.Types.ObjectId(),
+  email: 'unactivateduser@valid.com',
+  name: 'unactivated',
+  phone: phone('0974812323', 'VNM')[0],
+  password: bcrypt.hashSync('unactivated', 8),
+  accType: 2,
+  activated: false
+}
+
+const notActivatedUserFilms = {
+  _id: new mongoose.Types.ObjectId(),
+  userId: notActivatedUser._id,
+  films: []
+}
+
 const setupDatabase = async () => {
   await User.deleteMany({});
   await WatchedFilms.deleteMany({});
@@ -49,6 +65,8 @@ const setupDatabase = async () => {
   await new WatchedFilms(normalUserFilms).save();
   await new User(validAdminUser).save();
   await new WatchedFilms(adminUserFilms).save();
+  await new User(notActivatedUser).save();
+  await new WatchedFilms(notActivatedUserFilms).save();
 }
 
 module.exports = {
@@ -56,5 +74,6 @@ module.exports = {
   validAdminUser,
   validNormalUser,
   adminUserFilms,
-  normalUserFilms
+  normalUserFilms,
+  notActivatedUser
 }
