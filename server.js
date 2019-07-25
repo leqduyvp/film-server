@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const redis = require('redis');
+const cors = require('cors');
 
 const { port } = require('./config/server.config');
 const { dbURI } = require('./config/database.config');
@@ -29,6 +30,8 @@ client.on('connect', () => {
 });
 
 const app = express();
+
+app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

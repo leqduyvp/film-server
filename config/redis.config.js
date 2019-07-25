@@ -5,7 +5,7 @@ module.exports = {
   redisConnectTimeout: 60000,               // miliseconds
 
   // Custom configs
-  timeoutAllBanners: 6 * 60 * 60,           // seconds
-  timeoutAllCategories: 6 * 60 * 60,        // seconds
-  timeoutAllConfigs: 10 * 24 * 60 * 60      // seconds
+  timeoutAllBanners:  6,           // seconds
+  timeoutAllCategories: 6,        // seconds
+  timeoutAllConfigs: 6      // seconds
 }

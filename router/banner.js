@@ -1,6 +1,7 @@
 const express = require('express');
 
-const { checkBannerService, checkIdService, getAllBannersService, addBannerService, updateBannerService, deleteBannerService } = require('../service/banner.service');
+const { getAllBannersService, addBannerService, updateBannerService, deleteBannerService } = require('../service/banner.service');
+const { checkBanner, checkId } = require('../service/banner.validate');
 
 const router = express.Router();
 
@@ -10,6 +11,9 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   // Get data
   const { error, banners } = await getAllBannersService();
+  if (error.isError) {
+    return res.status(500).send(error);
+  }
 
   if (!banners || banners.length === 0) {
     error.isError = true;
@@ -35,16 +39,21 @@ router.post('/', async (req, res) => {
 
   // Check Authorization
 
-  const { image } = req.body;
+  const { image, action, payload } = req.body;
+  const input = {
+    image,
+    action,
+    payload
+  }
 
-  // Check image
-  error = checkBannerService(image);
+  // Check input
+  error = checkBanner(input);
   if (error.isError) {
     return res.status(400).send(error);
   }
 
   // Store data
-  error = await addBannerService(image);
+  error = await addBannerService(input);
   if (error.isError) {
     return res.status(500).send(error);
   }
@@ -64,22 +73,27 @@ router.patch('/', async (req, res) => {
   // Check Authorization
 
   const { id } = req.query;
-  const { image } = req.body;
+  const { image, action, payload } = req.body;
+  const input = {
+    image,
+    action,
+    payload
+  }
 
   // Check id
-  error = checkIdService(id);
+  error = checkId(id);
   if (error.isError) {
     return res.status(400).send(error);
   }
 
-  // Check image
-  error = checkBannerService(image);
+  // Check input
+  error = checkBanner(input);
   if (error.isError) {
     return res.status(400).send(error);
   }
 
   // Update data
-  error = await updateBannerService(id, image);
+  error = await updateBannerService(id, input);
   if (error.isError) {
     return res.status(500).send(error);
   }
@@ -101,7 +115,7 @@ router.delete('/', async (req, res) => {
   const { id } = req.query;
 
   // Check id
-  error = checkIdService(id);
+  error = checkId(id);
   if (error.isError) {
     return res.status(400).send(error);
   }
