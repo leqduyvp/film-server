@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('./users.model');
-// const watchedFilms = require('./watchedFilms.model');
+const watchedFilms = require('./watchedFilms.model');
+const client = require('./cache.connection');
 
 const userSave = async (user) => {
   if (!user._id) {
@@ -18,14 +19,19 @@ const getAllUser = async () => {
 
 const findUserById = async (id) => {
   try {
-    const user = await User.findById(id);
-    if (!user) return {
-      error: {
-        isError: true,
-        errorMessage: {
-          database: 'User invalid'
+    let user = await client.getAsync(id.toString() + '_user');
+    if (!user) {
+      user = await User.findById(id);
+      if (!user) return {
+        error: {
+          isError: true,
+          errorMessage: {
+            database: 'User invalid'
+          }
         }
       }
+      user = JSON.stringify(user);
+      client.setex(id.toString() + '_user', 10, user);
     }
     return user;
   } catch (err) {
@@ -40,8 +46,10 @@ const findUserById = async (id) => {
   }
 }
 
-const findUserByCredentials = async (email, password) => {
-  const user = await User.findOne({ email });
+const findUserByCredentials = async (credentials, loginUsername) => {
+  let queryObj = {};
+  queryObj[loginUsername] = credentials[loginUsername];
+  const user = await User.findOne(queryObj);
   if (!user) return {
     error: {
       isError: true,
@@ -51,12 +59,12 @@ const findUserByCredentials = async (email, password) => {
     }
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await bcrypt.compare(credentials.password, user.password);
   if (!isMatch) return {
     error: {
       isError: true,
       errorMessage: {
-        credentials: 'Wrong email or password'
+        credentials: 'Wrong credentials'
       }
     }
   }
@@ -68,13 +76,31 @@ const checkEmailExist = async (email) => {
   return User.findOne({ email });
 }
 
-const findUserByIdAndUpdate = (id, updates) => {
-  return User.findByIdAndUpdate(id, updates);
+const checkPhoneExist = (phone) => {
+  return User.findOne({ phone });
+}
+
+const findUserByIdAndUpdate = async (id, updates) => {
+  const user = await User.findById(id);
+  if(updates.password) updates.password = await bcrypt.hash(updates.password, 8);
+  for (let key in updates) {
+    user[key] = updates[key];
+  }
+  client.setex(id.toString() + '_user', 10, JSON.stringify(user));
+  return user.save();
 }
 
 const deleteUser = async (_id) => {
   await watchedFilms.deleteOne({ userId: _id });
   return User.deleteOne({ _id });
+}
+
+const userOtpSave = (userId, otp) => {
+  client.setex(userId.toString() + '_otp', 300, otp);
+}
+
+const findUserOtp = async (userId) => {
+  return await client.getAsync(userId.toString() + '_otp');
 }
 
 module.exports = {
@@ -84,5 +110,8 @@ module.exports = {
   findUserByCredentials,
   findUserByIdAndUpdate,
   getAllUser,
-  deleteUser
+  deleteUser,
+  checkPhoneExist,
+  userOtpSave,
+  findUserOtp
 }

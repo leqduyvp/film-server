@@ -14,12 +14,23 @@ const UserSchema = new mongoose.Schema({
     index: true,
     trim: true
   },
+  phone: {
+    type: String,
+    unique: true,
+    required: true,
+    index: true,
+    trim: true
+  },
   password: {
     type: String,
     required: true
   },
   accType: {
     type: Number,
+    required: true
+  },
+  activated: {
+    type: Boolean,
     required: true
   },
   dateRegistered: {
@@ -33,16 +44,6 @@ const UserSchema = new mongoose.Schema({
       require: true
     }
   }]
-});
-
-UserSchema.pre('update', async function (next) {
-  const user = this;
-
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 8);
-  }
-
-  next();
 });
 
 const User = mongoose.model('User', UserSchema);
