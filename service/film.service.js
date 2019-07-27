@@ -2,8 +2,7 @@ const redis = require('redis');
 
 const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
 const { addFilm, getFilmById, filterFilm } = require('../database/film');
-const { getFilmsByCategoryFromCache, setFilmsByCategoryToCache, setFilterFilms, getFilterFilms } = require('./film.cache');
-const { checkPagination, checkCategory } = require('./film.validate');
+const { setFilterFilmsToCache, getFilterFilmsFromCache } = require('./film.cache');
 
 // Create Redis Client
 const client = redis.createClient({
@@ -72,8 +71,9 @@ const filterFilmsService = async (input, page, records) => {
 
   try {
     let films = [];
+
     // Get films in cache
-    films = getFilterFilms(input, page, records);
+    films = await getFilterFilmsFromCache(input, page, records);
     if (films) {
       return {
         error,
@@ -84,9 +84,8 @@ const filterFilmsService = async (input, page, records) => {
     // If there isn't in cache, get it in database
     films = await filterFilm(input, page, records);
 
-
     // Set films to cache
-    setFilterFilms(input, page, records);
+    setFilterFilmsToCache(input, page, records, films);
 
     return {
       error,

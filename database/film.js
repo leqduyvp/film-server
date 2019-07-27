@@ -1,5 +1,6 @@
 // Loasd film model
 const Film = require('../database/Film.model');
+const { pageNumber, recordsNumber } = require('../config/film.config');
 
 const getFilmsByCategory = (category, page, records) => {
   return Film.find({
@@ -41,7 +42,7 @@ const getFilmById = id => {
   return Film.findById(id);
 }
 
-const filterFilm = (input, page = 1, records = 2) => {
+const filterFilm = (input, page = pageNumber, records = recordsNumber) => {
   page = Number.parseInt(page);
   records = Number.parseInt(records);
 

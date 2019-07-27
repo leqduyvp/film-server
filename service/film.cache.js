@@ -1,6 +1,8 @@
 const redis = require('redis');
 
-const { redisPort, redisHost, redisConnectTimeout, timeoutFilmsCategory } = require('../config/redis.config');
+const { redisPort, redisHost, redisConnectTimeout, timeoutFilterFilms, limitedPageCache } = require('../config/redis.config');
+const { pageNumber, recordsNumber } = require('../config/film.config');
+const { makeKeyFilter } = require('../utils/makeKeyRedis');
 
 // Create Redis Client
 const client = redis.createClient({
@@ -14,9 +16,36 @@ client.on('error', error => {
   console.log(error.message);
 });
 
-const getFilmsByCategoryFromCache = () => {
+
+const setFilterFilmsToCache = (input, page = pageNumber, records = recordsNumber, films) => {
+  // If page <= 10, cache films, else dont cache
+  if (page > limitedPageCache) {
+    return;
+  }
+
+  console.log('set filter films to cache');
+
+  const key = makeKeyFilter(input, page, records);
+
+  const filmsString = JSON.stringify(films);
+  client.setex(key, timeoutFilterFilms, filmsString, () => {
+    console.log(key, ' are stored to cache');
+  })
+
+}
+
+const getFilterFilmsFromCache = (input, page = pageNumber, records = recordsNumber) => {
+  // If page > limitedPageCache, films aren't in cache
+  if (page > limitedPageCache) {
+    return;
+  }
+
+  console.log('get filter films in cache');
+
+  const key = makeKeyFilter(input, page, records);
+
   return new Promise((resolve, reject) => {
-    client.get('filmsCategory', (error, result) => {
+    client.get(key, (error, result) => {
       if (error) {
         reject(error);
       }
@@ -25,24 +54,7 @@ const getFilmsByCategoryFromCache = () => {
   })
 }
 
-const setFilmsByCategoryToCache = filmsCategory => {
-  const filmsCategoryString = JSON.stringify(filmsCategory);
-  client.setex('filmsCategory', timeoutFilmsCategory, filmsCategoryString, () => {
-    console.log('filmsCategory are stored to cache');
-  })
-}
-
-const setFilterFilms = () => {
-  console.log('set filter films to cache');
-}
-
-const getFilterFilms = () => {
-  console.log('get filter film in cache');
-}
-
 module.exports = {
-  getFilmsByCategoryFromCache,
-  setFilmsByCategoryToCache,
-  setFilterFilms,
-  getFilterFilms
+  setFilterFilmsToCache,
+  getFilterFilmsFromCache
 }
