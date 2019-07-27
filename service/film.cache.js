@@ -32,7 +32,17 @@ const setFilmsByCategoryToCache = filmsCategory => {
   })
 }
 
+const setFilterFilms = () => {
+  console.log('set filter films to cache');
+}
+
+const getFilterFilms = () => {
+  console.log('get filter film in cache');
+}
+
 module.exports = {
   getFilmsByCategoryFromCache,
-  setFilmsByCategoryToCache
+  setFilmsByCategoryToCache,
+  setFilterFilms,
+  getFilterFilms
 }

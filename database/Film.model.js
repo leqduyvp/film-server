@@ -10,11 +10,13 @@ const FilmSchema = new Schema({
   },
   supportedResolution: {
     type: Array,
-    required: false
+    required: false,
+    default: null
   },
   dateReleased: {
     type: Date,
-    required: false
+    required: false,
+    default: null
   },
   dateCreated: {
     type: Date,
@@ -32,11 +34,15 @@ const FilmSchema = new Schema({
   },
   country: {
     type: String,
-    requried: false
+    requried: false,
+    trim: true,
+    lowercase: true,
+    default: null
   },
   time: {
     type: Number,
-    required: false
+    required: false,
+    default: null
   },
   episodeNumber: {
     type: Number,
@@ -44,7 +50,8 @@ const FilmSchema = new Schema({
   },
   imdb: {
     type: Number,
-    required: false
+    required: false,
+    default: null
   },
   scripts: {
     type: Array,
@@ -64,15 +71,19 @@ const FilmSchema = new Schema({
   },
   trailer: {
     type: String,
-    requried: false
+    requried: false,
+    trim: true,
+    default: null
   },
   image: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   thumb: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   type: {
     type: Array,
@@ -82,17 +93,10 @@ const FilmSchema = new Schema({
     type: Array,
     required: true
   },
-  rating: {
-    type: Object,
-    required: true,
-    ratingNumber: {
-      type: Number,
-      required: true
-    },
-    ratingId: {
-      type: ObjectId,
-      required: true
-    }
+  ratingNumber: {
+   type: Number,
+   required: true,
+   default: 0
   },
   views: {
     type: Number,
@@ -103,20 +107,11 @@ const FilmSchema = new Schema({
     type: Array,
     required: true
   },
-  content: [{
-    title: {
-      type: String,
-      required: false
-    },
-    link: {
-      type: String,
-      required: false
-    },
-    paragraphs: {
-      type: Array,
-      required: false
-    }
-  }]
+  content: {
+    type: String,
+    require: false,
+    default: null
+  }
 });
 
 module.exports = Film = mongoose.model('film', FilmSchema);

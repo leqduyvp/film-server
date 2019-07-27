@@ -1,4 +1,5 @@
-const checkString = require('../utils/checkString');
+const { checkString } = require('../utils/checkString');
+const { checkPositiveNumber } = require('../utils/checkPositiveNumber');
 
 const checkPagination = (page, records) => {
   let error = {
@@ -6,30 +7,23 @@ const checkPagination = (page, records) => {
     errorMessage: {}
   }
 
-  if (typeof page !== 'number') {
+  // Comment this to not alow page and records undefined
+  if (page === undefined && records === undefined) {
+    return error;
+  }
+
+  let check = checkPositiveNumber(page);
+  if (check.isError) {
     error.isError = true;
-    error.errorMessage.page = 'page must be a number';
+    error.errorMessage.page = 'page ' + check.message;
 
     return error;
   }
 
-  if (page <= 0) {
+  check = checkPositiveNumber(records);
+  if (check.isError) {
     error.isError = true;
-    error.errorMessage.page = 'page must be greater than 0';
-
-    return error;
-  }
-
-  if (typeof records !== 'number') {
-    error.isError = true;
-    error.errorMessage.records = 'records must be a number';
-
-    return error;
-  }
-
-  if (records <= 0) {
-    error.isError = true;
-    error.errorMessage.records = 'records must be greater than 0';
+    error.errorMessage.page = 'page ' + check.message;
 
     return error;
   }
@@ -55,7 +49,63 @@ const checkCategory = category => {
   return error;
 }
 
+const checkFilmInput = input => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  // Required fields
+  const fields = [
+    'title',
+    'category',
+    'episodeNumber',
+    'scripts',
+    'directors',
+    'characters',
+    'description',
+    'image',
+    'thumb',
+    'type',
+    'links',
+    'ratingNumber',
+    'views',
+    'tags'
+  ];
+
+  fields.forEach(field => {
+    if (input[field] === '' || !input[field]) {
+      error.isError = true;
+      error.errorMessage[field] = field + ' must not be empty';
+
+      return error;
+    }
+  });
+
+  return error;
+}
+
+const checkId = id => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  const err = checkString(id);
+
+  if (err.isError) {
+    error.isError = true;
+    error.errorMessage.id = 'id ' + err.message;
+
+    return error;
+  }
+
+  return error;
+}
+
 module.exports = {
   checkPagination,
-  checkCategory
+  checkCategory,
+  checkFilmInput,
+  checkId
 }

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const redis = require('redis');
+const cors = require('cors');
 
 const { port } = require('./config/server.config');
 const { dbURI } = require('./config/database.config');
@@ -10,6 +11,7 @@ const { redisPort, redisHost, redisConnectTimeout } = require('./config/redis.co
 const categories = require('./router/category');
 const banners = require('./router/banner');
 const configs = require('./router/config');
+const films = require('./router/film');
 
 // Create Redis Client
 const client = redis.createClient({
@@ -30,6 +32,8 @@ client.on('connect', () => {
 
 const app = express();
 
+app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -40,5 +44,6 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useFindAndModify: false })
 app.use('/api/categories', categories);
 app.use('/api/banners', banners);
 app.use('/api/configs', configs);
+app.use('/api/films', films);
 
 app.listen(port, () => console.log(`Server running on port: ${port}`));

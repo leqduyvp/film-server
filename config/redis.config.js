@@ -8,5 +8,6 @@ module.exports = {
   timeoutAllBanners: 6 * 60 * 60,           // seconds
   timeoutAllCategories: 6 * 60 * 60,        // seconds
   timeoutAllConfigs: 10 * 24 * 60 * 60,     // seconds
-  timeoutFilmsCategory: 10                  // seconds
+  timeoutFilmsCategory: 10,                 // seconds
+  timeoutFilterFilms: 10,                   // seconds
 }

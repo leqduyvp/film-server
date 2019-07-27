@@ -1,7 +1,8 @@
 const redis = require('redis');
 
 const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
-const { getFilmsByCategoryFromCache, setFilmsByCategoryToCache } = require('./film.cache');
+const { addFilm, getFilmById, filterFilm } = require('../database/film');
+const { getFilmsByCategoryFromCache, setFilmsByCategoryToCache, setFilterFilms, getFilterFilms } = require('./film.cache');
 const { checkPagination, checkCategory } = require('./film.validate');
 
 // Create Redis Client
@@ -16,45 +17,18 @@ client.on('error', error => {
   console.log(error.message);
 });
 
-const getFilmsByCategoryService = async (category, page = 1, records = 24) => {
+const addFilmService = async input => {
   let error = {
     isError: false,
     errorMessage: {}
   }
 
-  error = checkPagination(page, records);
-  if (error.isError) {
-    res.status(400).send(error);
-  }
-
-  error = checkCategory(category);
-  if (error.isError) {
-    res.status(400).send(error);
-  }
-
   try {
-    // Check category films in cache
-    // let filmsCategory = await getFilmsByCategoryFromCache();
-    // if (filmsCategory) {
-    //   return {
-    //     error,
-    //     filmsCategory
-    //   };
-    // }
+    await addFilm(input);
 
-    // If there aren't in cache, get in database
-    console.log('Get films by category from db')
-    let filmsCategory = await getFilmsByCategory(category, page, records);
+    // Update in cache
 
-    // Set films to cache
-    // console.log('Set films to cache');
-    // setFilmsByCategoryToCache();
-
-    return {
-      error,
-      filmsCategory
-    };
-
+    return error;
   } catch (err) {
     error.isError = true;
     error.errorMessage.database = err.message;
@@ -63,6 +37,73 @@ const getFilmsByCategoryService = async (category, page = 1, records = 24) => {
   }
 }
 
+const getFilmByIdService = async id => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  try {
+    let film = null;
+    // Get film in cache
+
+    // If there isn't in cache, get it in database
+    film = await getFilmById(id);
+
+    return {
+      error,
+      film
+    }
+  } catch (err) {
+    error.isError = true;
+    error.errorMessage.database = err.message;
+
+    return {
+      error
+    };
+  }
+}
+
+const filterFilmsService = async (input, page, records) => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  try {
+    let films = [];
+    // Get films in cache
+    films = getFilterFilms(input, page, records);
+    if (films) {
+      return {
+        error,
+        films
+      }
+    }
+
+    // If there isn't in cache, get it in database
+    films = await filterFilm(input, page, records);
+
+
+    // Set films to cache
+    setFilterFilms(input, page, records);
+
+    return {
+      error,
+      films
+    }
+  } catch (err) {
+    error.isError = true;
+    error.errorMessage.database = err.message;
+
+    return {
+      error
+    };
+  }
+}
+
 module.exports = {
-  getFilmsByCategoryService
+  addFilmService,
+  getFilmByIdService,
+  filterFilmsService
 }
