@@ -1,8 +1,8 @@
 const redis = require('redis');
 
 const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
-const { addFilm, getFilmById, filterFilm } = require('../database/film');
-const { setFilterFilmsToCache, getFilterFilmsFromCache } = require('./film.cache');
+const { addFilm, getFilmById, filterFilm, searchFilmByField } = require('../database/film');
+const { setFilterFilmsToCache, getFilterFilmsFromCache, getSearchFilmByFieldFromCache, setSearchFilmByFieldToCache } = require('./film.cache');
 
 // Create Redis Client
 const client = redis.createClient({
@@ -101,8 +101,47 @@ const filterFilmsService = async (input, page, records) => {
   }
 }
 
+const searchFilmByFieldService = async (input, page, records) => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  try {
+    let films = [];
+
+    // Get films in cache
+    films = await getSearchFilmByFieldFromCache(input, page, records);
+    if (films) {
+      return {
+        error,
+        films
+      }
+    }
+
+    // If there isn't in cache, search in database
+    films = await searchFilmByField(input, page, records);
+
+    // Set films to cache
+    setSearchFilmByFieldToCache(input, page, records, films);
+
+    return {
+      error,
+      films
+    }
+  } catch (err) {
+    error.isError = true;
+    error.errorMessage.database = err.message;
+
+    return {
+      error
+    };
+  }
+}
+
 module.exports = {
   addFilmService,
   getFilmByIdService,
-  filterFilmsService
+  filterFilmsService,
+  searchFilmByFieldService
 }

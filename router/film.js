@@ -1,7 +1,7 @@
 const express = require('express');
 
-const { addFilmService, getFilmByIdService, filterFilmsService } = require('../service/film.service');
-const { checkFilmInput, checkId, checkPagination } = require('../service/film.validate');
+const { addFilmService, getFilmByIdService, filterFilmsService, searchFilmByFieldService } = require('../service/film.service');
+const { checkAddFilmInput, checkId, checkPagination, checkSearchFilmByField } = require('../service/film.validate');
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
 
   const input = { ...req.body };
 
-  error = checkFilmInput(input);
+  error = checkAddFilmInput(input);
   if (error.isError) {
     return res.status(400).send(error);
   }
@@ -81,13 +81,62 @@ router.get('/filter', async (req, res) => {
     error.isError = true;
     error.errorMessage.films = 'Not Found';
 
-    return res.status(404).send(error)
+    return res.status(404).send(error);
   }
 
   return res.status(200).send({
     error,
     films
   });
-})
+});
+
+// @route   GET api/films/field=&value=&page=&records=
+// @desc    Search film by any field
+// @access  Public
+router.get('/field', async (req, res) => {
+  const {
+    field,
+    value,
+    page,
+    records
+  } = req.query;
+
+  const input = {
+    field,
+    value
+  }
+
+  // Check pagination
+  let check = checkPagination(page, records);
+  if (check.isError) {
+    return res.status(400).send(check);
+  }
+
+  // Check input
+  check = checkSearchFilmByField(input);
+  if (check.isError) {
+    return res.status(400).send(check);
+  }
+
+  const { error, films } = await searchFilmByFieldService(input, page, records);
+
+  if (error.isError) {
+    return res.status(500).send(error);
+  }
+
+  if (!films || films.length === 0) {
+    error.isError = true;
+    error.errorMessage.films = 'Not Found';
+
+    return res.status(404).send(error);
+  }
+
+  return res.status(200).send({
+    error,
+    films
+  });
+
+});
+
 
 module.exports = router;

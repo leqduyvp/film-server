@@ -49,7 +49,7 @@ const checkCategory = category => {
   return error;
 }
 
-const checkFilmInput = input => {
+const checkAddFilmInput = input => {
   let error = {
     isError: false,
     errorMessage: {}
@@ -103,9 +103,34 @@ const checkId = id => {
   return error;
 }
 
+const checkSearchFilmByField = input => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  // Required fields
+  const fields = [
+    'field',
+    'value'
+  ];
+
+  fields.forEach(field => {
+    if (input[field] === '' || !input[field]) {
+      error.isError = true;
+      error.errorMessage[field] = field + ' must not be empty';
+
+      return error;
+    }
+  });
+
+  return error;
+}
+
+
 module.exports = {
   checkPagination,
-  checkCategory,
-  checkFilmInput,
-  checkId
+  checkAddFilmInput,
+  checkId,
+  checkSearchFilmByField
 }

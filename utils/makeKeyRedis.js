@@ -1,5 +1,4 @@
-const makeKeyFilter = (input, page, records) => {
-  const fields = ['category', 'arrange', 'country', 'type', 'year'];
+const makeKey = (input, page, records, fields) => {
   let key = '';
 
   fields.forEach(field => {
@@ -13,9 +12,9 @@ const makeKeyFilter = (input, page, records) => {
   key += 'page' + '|' + page + '/';
   key += 'records' + '|' + records;
 
-  return key
+  return key;
 }
 
 module.exports = {
-  makeKeyFilter
+  makeKey
 }

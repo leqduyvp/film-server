@@ -113,9 +113,28 @@ const filterFilm = (input, page = pageNumber, records = recordsNumber) => {
   }
 }
 
+const searchFilmByField = (input, page = pageNumber, records = recordsNumber) => {
+  page = Number.parseInt(page);
+  records = Number.parseInt(records);
+
+  const { field, value } = input;
+  const search = {};
+
+  // Make regex to ignore case
+  search[field] = new RegExp(value, 'i');
+
+  return Film
+    .find({
+      ...search
+    })
+    .skip((page - 1) * records)
+    .limit(records);
+}
+
 module.exports = {
   getFilmsByCategory,
   addFilm,
   getFilmById,
-  filterFilm
+  filterFilm,
+  searchFilmByField
 }
