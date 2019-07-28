@@ -14,7 +14,9 @@ const userRateInit = {
   password: bcrypt.hashSync('userrateinit', 8),
   name: 'userrateinit',
   accType: 2,
-  ratedFilms: [{ filmId }]
+  ratedFilms: [{ filmId }],
+  activated: true,
+  phone: '+8465789032'
 }
 
 const rateFilm = {
@@ -32,7 +34,9 @@ const userRate = {
   email: 'rateuser@gmail.com',
   password: bcrypt.hashSync('rateuser', 8),
   name: 'rateuser',
-  accType: 2
+  accType: 2,
+  activated: true,
+  phone: '+8467834561'
 }
 
 const setupDatabase = async () => {

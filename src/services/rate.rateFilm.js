@@ -1,5 +1,5 @@
 const { rateSave } = require('../database/rate');
-const { userSave, findUserById } = require('../database/users');
+const { findUserByIdAndUpdate, findUserById } = require('../database/users');
 
 async function calcNewRate(req) {
   const filmRate = req.filmRate;
@@ -22,13 +22,13 @@ async function calcNewRate(req) {
   });
   filmRate.ratingNumber = newRate / filmRate.rates.length;
 
-  await userSave(req.user);
+  await findUserByIdAndUpdate(req.user._id, req.user);
   await rateSave(filmRate);
 }
 
 module.exports = async (req, res, next) => {
   try {
-    req.user = await findUserById(req.userId);
+    req.user = JSON.parse(await findUserById(req.userId));
     await calcNewRate(req);
     res.status(200).send({
       error: {

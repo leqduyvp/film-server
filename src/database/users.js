@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const User = require('./users.model');
-const watchedFilms = require('./watchedFilms.model');
+// const watchedFilms = require('./watchedFilms.model');
 const client = require('./cache.connection');
 
 const userSave = async (user) => {
