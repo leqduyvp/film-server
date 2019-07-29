@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
 const { setupDatabase, userRate, userRateInit, rateFilm } = require('./rate.dataInit');
 const { getRateByFilmId } = require('../database/rate');
-const app = require('../app');
+const app = require('../app').router;
 
 beforeEach(setupDatabase);
 
