@@ -40,7 +40,7 @@ module.exports = async (req, res, next) => {
       });
     }
     const platform = req.get('platform');
-    generateToken(user._id, platform, res);
+    generateToken(user._id, user.accType, platform, res);
   } catch (e) {
     console.log(e.message);
     res.status(500).send({
