@@ -23,25 +23,7 @@ const checkPagination = (page, records) => {
   check = checkPositiveNumber(records);
   if (check.isError) {
     error.isError = true;
-    error.errorMessage.page = 'page ' + check.message;
-
-    return error;
-  }
-
-  return error;
-}
-
-const checkCategory = category => {
-  let error = {
-    isError: false,
-    errorMessage: {}
-  }
-
-  const err = checkString(id);
-
-  if (err.isError) {
-    error.isError = true;
-    error.errorMessage.id = 'category ' + err.message;
+    error.errorMessage.page = 'records ' + check.message;
 
     return error;
   }

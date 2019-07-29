@@ -1,8 +1,28 @@
 const redis = require('redis');
 
 const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
-const { addFilm, getFilmById, filterFilm, searchFilmByField } = require('../database/film');
-const { setFilterFilmsToCache, getFilterFilmsFromCache, getSearchFilmByFieldFromCache, setSearchFilmByFieldToCache } = require('./film.cache');
+const {
+  addFilm,
+  getFilmById,
+  filterFilm,
+  searchFilmByField,
+  getAllFilms,
+  searchFilm,
+  deleteFilm,
+  getRelatedFilms
+} = require('../database/film');
+const {
+  setFilterFilmsToCache,
+  getFilterFilmsFromCache,
+  getSearchFilmByFieldFromCache,
+  setSearchFilmByFieldToCache,
+  getAllFilmsFromCache,
+  setAllFilmsToCache,
+  getSearchFilmsFromCache,
+  setSearchFilmsToCache,
+  getRelatedFilmsFromCache,
+  setRelatedFilmsToCache
+} = require('./film.cache');
 
 // Create Redis Client
 const client = redis.createClient({
@@ -139,9 +159,148 @@ const searchFilmByFieldService = async (input, page, records) => {
   }
 }
 
+const getAllFilmsService = async (page, records) => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  try {
+    let films = [];
+
+    // Get films in cache
+    films = await getAllFilmsFromCache(page, records);
+    if (films) {
+      return {
+        error,
+        films
+      }
+    }
+
+    // If there isn't in cache, search in database
+    films = await getAllFilms(page, records);
+
+    // Set films to cache
+    setAllFilmsToCache(page, records, films);
+
+    return {
+      error,
+      films
+    }
+  } catch (err) {
+    error.isError = true;
+    error.errorMessage.database = err.message;
+
+    return {
+      error
+    };
+  }
+}
+
+const searchFilmService = async (value, page, records) => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  try {
+    let films = [];
+
+    // Get films in cache
+    films = await getSearchFilmsFromCache(value, page, records);
+    if (films) {
+      return {
+        error,
+        films
+      }
+    }
+
+    // If there isn't in cache, search in database
+    films = await searchFilm(value, page, records);
+
+    // Set films to cache
+    setSearchFilmsToCache(value, page, records, films);
+
+    return {
+      error,
+      films
+    }
+  } catch (err) {
+    error.isError = true;
+    error.errorMessage.database = err.message;
+
+    return {
+      error
+    };
+  }
+}
+
+const deleteFilmService = async id => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  };
+
+  try {
+    // Delete in database
+    await deleteFilm(id);
+
+    // Delete in cache
+
+    return error;
+  } catch (err) {
+    error.isError = true;
+    error.errorMessage.database = err.message;
+
+    return error;
+  }
+}
+
+const getRelatedFilmsService = async (id, page, records) => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  try {
+    let films = [];
+
+    // Get films in cache
+    films = await getRelatedFilmsFromCache(id, page, records);
+    if (films) {
+      return {
+        error,
+        films
+      }
+    }
+
+    // If there isn't in cache, search in database
+    films = await getRelatedFilms(id, page, records);
+
+    // // Set films to cache
+    setRelatedFilmsToCache(id, page, records, films);
+
+    return {
+      error,
+      films
+    }
+  } catch (err) {
+    error.isError = true;
+    error.errorMessage.database = err.message;
+
+    return {
+      error
+    };
+  }
+}
+
 module.exports = {
   addFilmService,
   getFilmByIdService,
   filterFilmsService,
-  searchFilmByFieldService
+  searchFilmByFieldService,
+  getAllFilmsService,
+  searchFilmService,
+  deleteFilmService,
+  getRelatedFilmsService
 }

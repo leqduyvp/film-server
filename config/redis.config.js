@@ -13,4 +13,7 @@ module.exports = {
   timeoutFilmsCategory: 10,                 // seconds
   timeoutFilterFilms: 10,                   // seconds
   timeoutSearchFilmByField: 10,             // seconds
+  timeoutAllFilms: 10,                      // seconds
+  timeoutSearchFilm: 10,                    // seconds
+  timeoutRelatedFilms: 10,                  // seconds
 }
