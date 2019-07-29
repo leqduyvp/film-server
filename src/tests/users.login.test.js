@@ -2,7 +2,7 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
 const { setupDatabase, notActivatedUser, validNormalUser } = require('./users.dataInit');
-const app = require('../app');
+const app = require('../app').router;
 
 beforeEach(setupDatabase);
 

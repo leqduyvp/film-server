@@ -6,7 +6,6 @@ const watchedFilmsSave = (watchedFilmsObject) => {
 }
 
 const getWatchedFilmsByUserId = async (userId) => {
-  // return WatchedFilms.findOne({ userId }, { films: 1, _id: 0 }); 
   try {
     let watchedFilms = await client.getAsync(userId.toString() + '_watched');
     if (!watchedFilms) {

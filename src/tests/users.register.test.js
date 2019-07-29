@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
 const { setupDatabase, validAdminUser, validNormalUser, notActivatedUser } = require('./users.dataInit');
 const { findUserByCredentials, findUserOtp } = require('../database/users');
-const app = require('../app');
+const app = require('../app').router;
 
 beforeEach(setupDatabase);
 

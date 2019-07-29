@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const secret = require('../config/jwtSecret');
 const { findUserById } = require('../database/users');
 const { setupDatabase, validNormalUser } = require('./users.dataInit');
-const app = require('../app');
+const app = require('../app').router;
 
 beforeEach(setupDatabase);
 
