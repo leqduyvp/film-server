@@ -1,6 +1,9 @@
 const { client } = require('./redis.connection');
+<<<<<<< HEAD
 
 const { timeoutAllCategories } = require('../config/redis.config');
+=======
+>>>>>>> feature/category
 
 const getAllCategoriesFromCache = () => {
   return new Promise((resolve, reject) => {

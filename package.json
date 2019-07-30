@@ -7,9 +7,16 @@
     "test": "test"
   },
   "scripts": {
+<<<<<<< HEAD
     "test": "jest --detectOpenHandles --watch",
+=======
+    "test": "jest --watch --runInBand",
+>>>>>>> feature/category
     "start": "node server.js",
     "server": "nodemon server.js"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "repository": {
     "type": "git",

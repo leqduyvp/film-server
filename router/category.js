@@ -1,6 +1,7 @@
 const express = require('express');
 
-const { checkInputService, checkIdService, changeInputService, getAllCategoriesService, addCategoryService, updateCategoryService, deleteCategoryService } = require('../service/category.service');
+const { getAllCategoriesService, addCategoryService, updateCategoryService, deleteCategoryService } = require('../service/category.service');
+const { checkId, checkInput } = require('../service/category.validate');
 
 const router = express.Router();
 
@@ -10,6 +11,9 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   // Get data
   const { error, categories } = await getAllCategoriesService();
+  if (error.isError) {
+    return res.status(500).send(error);
+  }
 
   if (!categories || categories.length === 0) {
     error.isError = true;
@@ -35,19 +39,16 @@ router.post('/', async (req, res) => {
 
   // Check Authorization
 
-  const { key, values } = req.body;
+  const { parentCategory, childrenCategories } = req.body;
 
   // Check input data
-  error = checkInputService(key, values);
+  error = checkInput(parentCategory, childrenCategories);
   if (error.isError) {
     return res.status(400).send(error);
   }
 
-  // Change input data: trim and convert to lower case
-  const { changedKey, changedValues } = changeInputService(key, values);
-
   // Store data
-  error = await addCategoryService(changedKey, changedValues);
+  error = await addCategoryService(parentCategory, childrenCategories);
   if (error.isError) {
     return res.status(500).send(error);
   }
@@ -65,25 +66,22 @@ router.patch('/', async (req, res) => {
   };
 
   const { id } = req.query;
-  const { key, values } = req.body;
+  const { parentCategory, childrenCategories } = req.body;
 
   // Check id
-  error = checkIdService(id);
+  error = checkId(id);
   if (error.isError) {
     return res.status(400).send(error);
   }
 
   // Check input data
-  error = checkInputService(key, values);
+  error = checkInput(parentCategory, childrenCategories);
   if (error.isError) {
     return res.status(400).send(error);
   }
 
-  // Change input data: trim and convert to lower case
-  const { changedKey, changedValues } = changeInputService(key, values);
-
   // Update category
-  error = await updateCategoryService(id, changedKey, changedValues);
+  error = await updateCategoryService(id, parentCategory, childrenCategories);
   if (error.isError) {
     return res.status(500).send(error);
   }
@@ -104,7 +102,7 @@ router.delete('/', async (req, res) => {
   const { id } = req.query;
 
   // Check id
-  error = checkIdService(id);
+  error = checkId(id);
   if (error.isError) {
     return res.status(400).send(error);
   }
