@@ -1,5 +1,5 @@
 const { timeoutAllBanners } = require('../config/redis.config');
-const client = require('./redis.connection');
+const { client } = require('./redis.connection');
 
 const getAllBannersFromCache = () => {
   return new Promise((resolve, reject) => {
