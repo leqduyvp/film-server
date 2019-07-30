@@ -4,7 +4,7 @@ const secret = require('../config/jwtSecret');
 const { setupDatabase, notActivatedUser, validNormalUser } = require('./users.dataInit');
 const app = require('../app').router;
 
-beforeEach(setupDatabase);
+beforeAll(setupDatabase);
 
 test('Should log in for valid user with email', async () => {
   const response = await request(app).post('/users/login')

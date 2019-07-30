@@ -4,7 +4,7 @@ const secret = require('../config/jwtSecret');
 const { setupDatabase, validNormalUser } = require('./users.dataInit');
 const app = require('../app').router;
 
-beforeEach(setupDatabase);
+beforeAll(setupDatabase);
 
 test("Should get profile for authenticated user", async () => {
   const response = await request(app).get('/users/me')

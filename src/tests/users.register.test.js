@@ -5,7 +5,7 @@ const { setupDatabase, validAdminUser, validNormalUser, notActivatedUser } = req
 const { findUserByCredentials, findUserOtp } = require('../database/users');
 const app = require('../app').router;
 
-beforeEach(setupDatabase);
+beforeAll(setupDatabase);
 
 test('Should sign up valid normal user', async () => {
   const response = await request(app).post('/users/register')

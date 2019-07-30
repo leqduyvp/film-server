@@ -1,11 +1,9 @@
 const request = require('supertest');
-const jwt = require('jsonwebtoken');
-const secret = require('../config/jwtSecret');
 const { setupDatabase, notActivatedUser, validNormalUser } = require('./users.dataInit');
-const { findUserById, findUserByCredentials, findUserOtp } = require('../database/users');
+const { findUserById, findUserOtp } = require('../database/users');
 const app = require('../app').router;
 
-beforeEach(setupDatabase);
+beforeAll(setupDatabase);
 
 test('Should activate for not activated user', async () => {
   const regisObject = {};

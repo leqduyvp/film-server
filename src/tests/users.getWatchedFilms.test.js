@@ -4,7 +4,7 @@ const secret = require('../config/jwtSecret');
 const { setupDatabase, normalUserFilms, validNormalUser } = require('./users.dataInit');
 const app = require('../app').router;
 
-beforeEach(setupDatabase);
+beforeAll(setupDatabase);
 
 const userToken = jwt.sign({ id: validNormalUser._id, platform: 'web' }, secret, { expiresIn: '2h' });
 
