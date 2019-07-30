@@ -1,21 +1,6 @@
-const redis = require('redis');
-
-const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
 const { getAllBannersFromCache, setAllBannersToCache } = require('../service/banner.cache');
 const { getAllBanners, addBanner, updateBanner, deleteBanner } = require('../database/banner');
 const { checkString } = require('../utils/checkString');
-
-// Create Redis Client
-const client = redis.createClient({
-  host: redisHost,
-  port: redisPort,
-  connect_timeout: redisConnectTimeout
-});
-
-// Handle error
-client.on('error', error => {
-  console.log(error.message);
-});
 
 const checkBannerService = imageLink => {
   let error = {
@@ -87,7 +72,9 @@ const getAllBannersService = async () => {
     error.isError = true;
     error.errorMessage.database = err.message;
 
-    return error;
+    return {
+      error
+    };
   }
 }
 

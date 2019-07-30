@@ -1,18 +1,4 @@
-const redis = require('redis');
-
-const { redisPort, redisHost, redisConnectTimeout, timeoutAllCategories } = require('../config/redis.config');
-
-// Create Redis Client
-const client = redis.createClient({
-  host: redisHost,
-  port: redisPort,
-  connect_timeout: redisConnectTimeout
-});
-
-// Handle error
-client.on('error', error => {
-  console.log(error.message);
-});
+const { client } = require('./redis.connection');
 
 const getAllCategoriesFromCache = () => {
   return new Promise((resolve, reject) => {

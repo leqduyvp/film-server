@@ -1,20 +1,5 @@
-const redis = require('redis');
-
-const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
 const { getAllCategoriesFromCache, setAllCategoriesToCache } = require('../service/category.cache');
 const { getAllCategories, addCategory, updateCategory, deleteCategory } = require('../database/category');
-
-// Create Redis Client
-const client = redis.createClient({
-  host: redisHost,
-  port: redisPort,
-  connect_timeout: redisConnectTimeout
-});
-
-// Handle error
-client.on('error', error => {
-  console.log(error.message);
-});
 
 const getAllCategoriesService = async () => {
   let error = {
@@ -49,7 +34,9 @@ const getAllCategoriesService = async () => {
     error.isError = true;
     error.errorMessage.database = err.message;
 
-    return error;
+    return {
+      error
+    };
   }
 }
 
