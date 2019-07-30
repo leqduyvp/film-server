@@ -1,57 +1,5 @@
-const redis = require('redis');
-
-const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
 const { getAllBannersFromCache, setAllBannersToCache } = require('../service/banner.cache');
 const { getAllBanners, addBanner, updateBanner, deleteBanner } = require('../database/banner');
-const { checkString } = require('../utils/checkString');
-
-// Create Redis Client
-const client = redis.createClient({
-  host: redisHost,
-  port: redisPort,
-  connect_timeout: redisConnectTimeout
-});
-
-// Handle error
-client.on('error', error => {
-  console.log(error.message);
-});
-
-const checkBannerService = imageLink => {
-  let error = {
-    isError: false,
-    errorMessage: {}
-  }
-
-  const err = checkString(imageLink);
-
-  if (err.isError) {
-    error.isError = true;
-    error.errorMessage.image = 'image link ' + err.message;
-
-    return error;
-  }
-
-  return error;
-}
-
-const checkIdService = id => {
-  let error = {
-    isError: false,
-    errorMessage: {}
-  }
-
-  const err = checkString(id);
-
-  if (err.isError) {
-    error.isError = true;
-    error.errorMessage.id = 'id ' + err.message;
-
-    return error;
-  }
-
-  return error;
-}
 
 const getAllBannersService = async () => {
   let error = {
@@ -60,9 +8,11 @@ const getAllBannersService = async () => {
   }
 
   try {
+    let banners = [];
+
     // Check all banners in cache
     console.log('Get allBanners from cache')
-    let banners = await getAllBannersFromCache();
+    banners = await getAllBannersFromCache();
     if (banners) {
       return {
         error,
@@ -87,18 +37,20 @@ const getAllBannersService = async () => {
     error.isError = true;
     error.errorMessage.database = err.message;
 
-    return error;
+    return {
+      error
+    };
   }
 }
 
-const addBannerService = async imageLink => {
+const addBannerService = async input => {
   let error = {
     isError: false,
     errorMessage: {}
   }
 
   try {
-    await addBanner(imageLink);
+    await addBanner(input);
 
     // Update in cache
 
@@ -111,7 +63,7 @@ const addBannerService = async imageLink => {
   }
 }
 
-const updateBannerService = async (id, imageLink) => {
+const updateBannerService = async (id, input) => {
   let error = {
     isError: false,
     errorMessage: {}
@@ -119,7 +71,7 @@ const updateBannerService = async (id, imageLink) => {
 
   try {
     // Store data to database
-    await updateBanner(id, imageLink);
+    await updateBanner(id, input);
 
     // Update data in cache
 
@@ -154,8 +106,6 @@ const deleteBannerService = async id => {
 }
 
 module.exports = {
-  checkBannerService,
-  checkIdService,
   getAllBannersService,
   addBannerService,
   updateBannerService,
