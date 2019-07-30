@@ -1,6 +1,3 @@
-const redis = require('redis');
-
-const { redisPort, redisHost, redisConnectTimeout } = require('../config/redis.config');
 const {
   addFilm,
   getFilmById,
@@ -23,18 +20,6 @@ const {
   getRelatedFilmsFromCache,
   setRelatedFilmsToCache
 } = require('./film.cache');
-
-// Create Redis Client
-const client = redis.createClient({
-  host: redisHost,
-  port: redisPort,
-  connect_timeout: redisConnectTimeout
-});
-
-// Handle error
-client.on('error', error => {
-  console.log(error.message);
-});
 
 const addFilmService = async input => {
   let error = {

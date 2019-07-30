@@ -1,4 +1,4 @@
-const { client } = require('./redis.connection');
+const { getDataFromRedis, storeToRedis } = require('../utils/redis');
 
 const {
   timeoutFilterFilms,
@@ -8,7 +8,7 @@ const {
   timeoutSearchFilm,
   timeoutRelatedFilms } = require('../config/redis.config');
 const { pageNumber, recordsNumber } = require('../config/film.config');
-const { makeKey } = require('../utils/makeKeyRedis');
+const { makeKey } = require('../utils/redis');
 
 const fieldsFilter = ['category', 'arrange', 'country', 'type', 'year'];
 const fieldsSearch = ['field', 'value'];
@@ -26,10 +26,7 @@ const setFilterFilmsToCache = (input, page = pageNumber, records = recordsNumber
 
   const key = makeKey(input, page, records, fieldsFilter);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutFilterFilms, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutFilterFilms);
 }
 
 const getFilterFilmsFromCache = (input, page = pageNumber, records = recordsNumber) => {
@@ -42,14 +39,7 @@ const getFilterFilmsFromCache = (input, page = pageNumber, records = recordsNumb
 
   const key = makeKey(input, page, records, fieldsFilter);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
 
 const setSearchFilmByFieldToCache = (input, page = pageNumber, records = recordsNumber, films) => {
@@ -62,10 +52,7 @@ const setSearchFilmByFieldToCache = (input, page = pageNumber, records = records
 
   const key = makeKey(input, page, records, fieldsSearch);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutSearchFilmByField, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutSearchFilmByField);
 }
 
 const getSearchFilmByFieldFromCache = (input, page = pageNumber, records = recordsNumber) => {
@@ -78,14 +65,7 @@ const getSearchFilmByFieldFromCache = (input, page = pageNumber, records = recor
 
   const key = makeKey(input, page, records, fieldsSearch);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
 
 const setAllFilmsToCache = (page = pageNumber, records = recordsNumber, films) => {
@@ -98,10 +78,7 @@ const setAllFilmsToCache = (page = pageNumber, records = recordsNumber, films) =
 
   const key = makeKey({}, page, records, fieldsAllFilms);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutAllFilms, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutAllFilms);
 }
 
 const getAllFilmsFromCache = (page = pageNumber, records = recordsNumber) => {
@@ -114,14 +91,7 @@ const getAllFilmsFromCache = (page = pageNumber, records = recordsNumber) => {
 
   const key = makeKey({}, page, records, fieldsAllFilms);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
 
 const setSearchFilmsToCache = (value, page = pageNumber, records = recordsNumber, films) => {
@@ -134,10 +104,7 @@ const setSearchFilmsToCache = (value, page = pageNumber, records = recordsNumber
 
   const key = makeKey({ value }, page, records, fieldSearchFilm);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutSearchFilm, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutSearchFilm);
 }
 
 const getSearchFilmsFromCache = (value, page = pageNumber, records = recordsNumber) => {
@@ -150,14 +117,7 @@ const getSearchFilmsFromCache = (value, page = pageNumber, records = recordsNumb
 
   const key = makeKey({ value }, page, records, fieldSearchFilm);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
 
 const setRelatedFilmsToCache = (id, page = pageNumber, records = recordsNumber, films) => {
@@ -170,10 +130,7 @@ const setRelatedFilmsToCache = (id, page = pageNumber, records = recordsNumber, 
 
   const key = makeKey({ id }, page, records, fieldRelatedFilms);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutRelatedFilms, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutRelatedFilms);
 }
 
 const getRelatedFilmsFromCache = (id, page = pageNumber, records = recordsNumber) => {
@@ -186,14 +143,7 @@ const getRelatedFilmsFromCache = (id, page = pageNumber, records = recordsNumber
 
   const key = makeKey({ id }, page, records, fieldRelatedFilms);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
 module.exports = {
   setFilterFilmsToCache,

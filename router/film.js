@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
     return res.status(400).send({ error: check });
   }
 
-  const { error, films } = await getAllFilmsService(page, records);
+  const { error, films, totalRecords } = await getAllFilmsService(page, records);
   if (error.isError) {
     return res.status(500).send({ error });
   }
@@ -45,7 +45,8 @@ router.get('/', async (req, res) => {
 
   return res.status(200).send({
     error,
-    films
+    films,
+    totalRecords
   });
 })
 
