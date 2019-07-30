@@ -1,9 +1,6 @@
-const redis = require('redis');
+const { client } = require('./redis.connection');
 
 const {
-  redisPort,
-  redisHost,
-  redisConnectTimeout,
   timeoutFilterFilms,
   limitedPagesCache,
   timeoutSearchFilmByField,
@@ -12,18 +9,6 @@ const {
   timeoutRelatedFilms } = require('../config/redis.config');
 const { pageNumber, recordsNumber } = require('../config/film.config');
 const { makeKey } = require('../utils/makeKeyRedis');
-
-// Create Redis Client
-const client = redis.createClient({
-  host: redisHost,
-  port: redisPort,
-  connect_timeout: redisConnectTimeout
-});
-
-// Handle error
-client.on('error', error => {
-  console.log(error.message);
-});
 
 const fieldsFilter = ['category', 'arrange', 'country', 'type', 'year'];
 const fieldsSearch = ['field', 'value'];
