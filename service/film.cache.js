@@ -10,11 +10,6 @@ const {
 const { pageNumber, recordsNumber } = require('../config/film.config');
 const { makeKey } = require('../utils/makeKeyRedis');
 
-// Handle error
-client.on('error', error => {
-  console.log(error.message);
-});
-
 const fieldsFilter = ['category', 'arrange', 'country', 'type', 'year'];
 const fieldsSearch = ['field', 'value'];
 const fieldsAllFilms = ['allFilms'];
