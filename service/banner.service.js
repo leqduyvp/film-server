@@ -24,9 +24,11 @@ const getAllBannersService = async () => {
   }
 
   try {
+    let banners = [];
+
     // Check all banners in cache
     console.log('Get allBanners from cache')
-    let banners = await getAllBannersFromCache();
+    banners = await getAllBannersFromCache();
     if (banners) {
       return {
         error,
