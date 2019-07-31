@@ -7,13 +7,16 @@ const RateSchema = new mongoose.Schema({
   },
   filmId: {
     type: mongoose.Schema.Types.ObjectId,
+    unique: true,
+    index: true,
     required: true
   },
   rates: [{
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       unique: true,
-      required: true
+      required: true,
+      index: true
     },
     rating: {
       type: Number,
