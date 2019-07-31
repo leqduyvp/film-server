@@ -1,6 +1,6 @@
 const phone = require('phone');
 const { findUserByCredentials } = require('../database/users');
-const generateToken = require('../services/token.generate');
+const generateToken = require('./token.generate');
 
 const validCredentials = (req) => {
   if ((!req.body.email && !req.body.phone) || !req.body.password)
