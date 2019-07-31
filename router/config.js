@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     error.isError = true;
     error.errorMessage.configs = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
@@ -46,16 +46,16 @@ router.post('/', authToken, async (req, res) => {
   // Check input data
   error = checkInputService(key, values);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Store data
   error = await addConfigService(key, values);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(201).send(error);
+  return res.status(201).send({ error });
 });
 
 // @route   PATCH api/configss?id=
@@ -79,22 +79,22 @@ router.patch('/', authToken, async (req, res) => {
   // Check id
   error = checkIdService(id);
   if (error.isError === true) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Check input data
   error = checkInputService(key, values);
   if (error.isError === true) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Update category
   error = await updateConfigService(id, key, values);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 });
 
 // @route   GET api/configs?key=
@@ -106,7 +106,7 @@ router.get('/search', async (req, res) => {
   // Check key
   const check = checkKeyService(key);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
   // Search config in database and return to client
@@ -116,7 +116,7 @@ router.get('/search', async (req, res) => {
     error.isError = true;
     error.errorMessage.configs = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
@@ -146,17 +146,17 @@ router.delete('/', authToken, async (req, res) => {
   // Check id
   error = checkIdService(id);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Delete a config in database
   error = await deleteConfigService(id);
 
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 });
 
 module.exports = router;
