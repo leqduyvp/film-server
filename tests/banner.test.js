@@ -1,6 +1,6 @@
 const request = require('supertest');
 
-const app = require('../app');
+const app = require('../server');
 const Banner = require('../database/Banner.model');
 
 const { setupDatabase, bannerInit } = require('./banner.dataInit');

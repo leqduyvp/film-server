@@ -4,14 +4,14 @@ const bcrypt = require('bcryptjs');
 const secret = require('../config/jwtSecret');
 const { findUserById } = require('../database/users');
 const { setupDatabase, validNormalUser } = require('./users.dataInit');
-const app = require('../app').router;
+const app = require('../server');
 
 beforeAll(setupDatabase);
 
 const userToken = jwt.sign({ id: validNormalUser._id, platform: 'web' }, secret, { expiresIn: '2h' });
 
 test("Should update valid field", async () => {
-  const response = await request(app).patch('/users/edit')
+  const response = await request(app).patch('/api/users/edit')
     .set('access-token', userToken)
     .send({
       name: 'newname',
@@ -25,7 +25,7 @@ test("Should update valid field", async () => {
 });
 
 test("Should not update unauthenticated user", async () => {
-  const response = await request(app).patch('/users/edit')
+  const response = await request(app).patch('/api/users/edit')
     .send({
       name: 'newname',
       password: 'newpassword'
@@ -36,7 +36,7 @@ test("Should not update unauthenticated user", async () => {
 });
 
 test("Should not update invalid field", async () => {
-  const response = await request(app).patch('/users/edit')
+  const response = await request(app).patch('/api/users/edit')
     .set('access-token', userToken)
     .send({
       invalid: 'invalid'
@@ -46,7 +46,7 @@ test("Should not update invalid field", async () => {
 });
 
 test("Should not update invalid data", async () => {
-  const response = await request(app).patch('/users/edit')
+  const response = await request(app).patch('/api/users/edit')
     .set('access-token', userToken)
     .send({
       name: '',

@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { setupDatabase, notActivatedUser, validNormalUser } = require('./users.dataInit');
 const { findUserById, findUserOtp } = require('../database/users');
-const app = require('../app').router;
+const app = require('../server');
 
 beforeAll(setupDatabase);
 
@@ -12,10 +12,10 @@ test('Should activate for not activated user', async () => {
   delete regisObject.activated;
   regisObject.password = 'unactivated';
 
-  const regisRes = await request(app).post('/users/register').send(regisObject);
+  const regisRes = await request(app).post('/api/users/register').send(regisObject);
 
   const otp = await findUserOtp(regisRes.body.userId);
-  const response = await request(app).post('/users/activate')
+  const response = await request(app).post('/api/users/activate')
     .query({ userId: regisRes.body.userId })
     .send({ otp })
 
@@ -26,7 +26,7 @@ test('Should activate for not activated user', async () => {
 });
 
 test('Should not activate for activated user', async () => {
-  const response = await request(app).post('/users/activate')
+  const response = await request(app).post('/api/users/activate')
     .query({ userId: validNormalUser._id.toHexString() })
     .send({ otp: '1234' })
     .expect(400);
