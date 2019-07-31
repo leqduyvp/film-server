@@ -102,10 +102,22 @@ const phoneValidator = async (body, error) => {
   }
 }
 
+const rateValidator = (body, error) => {
+  const rate = body.rate;
+  if (Math.floor(rate) * 10 != rate * 10) {
+    error.isError = true;
+    error.errorMessage.rate = 'Rate number is not an integer';
+  } else if (rate < 1 || rate > 5) {
+    error.isError = true;
+    error.errorMessage.rate = 'Rate number is out of range [1 .. 5]';
+  }
+}
+
 module.exports = {
   emailValidator,
   passwordValidator,
   accTypeValidator,
   nameValidator,
-  phoneValidator
+  phoneValidator,
+  rateValidator
 }
