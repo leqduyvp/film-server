@@ -6,7 +6,7 @@ const cors = require('cors');
 
 const { port } = require('./config/server.config');
 const { dbURI } = require('./config/database.config');
-const { redisPort, redisHost, redisConnectTimeout } = require('./config/redis.config');
+const {client} = require('./service/redis.connection');
 
 const categories = require('./router/category');
 const banners = require('./router/banner');
@@ -14,12 +14,6 @@ const configs = require('./router/config');
 const films = require('./router/film');
 const users = require('./router/users.router');
 
-// Create Redis Client
-const client = redis.createClient({
-  host: redisHost,
-  port: redisPort,
-  connect_timeout: redisConnectTimeout
-});
 
 // Handle error
 client.on('error', error => {
@@ -47,5 +41,5 @@ app.use('/api/banners', banners);
 app.use('/api/configs', configs);
 app.use('/api/films', films);
 app.use('/api/users', users);
-
+module.exports = app;
 app.listen(port, () => console.log(`Server running on port: ${port}`));
