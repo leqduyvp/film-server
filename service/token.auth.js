@@ -27,8 +27,9 @@ module.exports = async (req, res, next) => {
   try {
     const token = req.header('access-token');
     const decoded = jwt.verify(token, secret);
-    const { id, platform } = decoded;
+    const { id, platform, accType } = decoded;
     req.userId = id;
+    req.userAccType = accType;
     next();
   } catch (error) {
     handleTokenDatabaseError(error, res);

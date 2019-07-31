@@ -2,6 +2,7 @@ const express = require('express');
 
 const { getAllCategoriesService, addCategoryService, updateCategoryService, deleteCategoryService } = require('../service/category.service');
 const { checkId, checkInput } = require('../service/category.validate');
+const authToken = require('../service/token.auth');
 
 const router = express.Router();
 
@@ -31,13 +32,18 @@ router.get('/', async (req, res) => {
 // @route   POST api/categories
 // @desc    Add a category
 // @access  Private
-router.post('/', async (req, res) => {
+router.post('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
 
   // Check Authorization
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { parentCategory, childrenCategories } = req.body;
 
@@ -59,11 +65,17 @@ router.post('/', async (req, res) => {
 // @route   PATCH api/categories?id=
 // @desc    Update a category
 // @access  Private
-router.patch('/', async (req, res) => {
+router.patch('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
+
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { id } = req.query;
   const { parentCategory, childrenCategories } = req.body;
@@ -93,13 +105,19 @@ router.patch('/', async (req, res) => {
 // @route   DELETE api/categories?id=
 // @desc    DELETE a category
 // @access  Private
-router.delete('/', async (req, res) => {
+router.delete('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
 
   const { id } = req.query;
+
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   // Check id
   error = checkId(id);

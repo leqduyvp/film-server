@@ -1,6 +1,7 @@
 const express = require('express');
 
 const { checkInputService, checkIdService, checkKeyService, getAllConfigsService, addConfigService, updateConfigService, searchConfigByKeyService, deleteConfigService } = require('../service/config.service');
+const authToken = require('../service/token.auth');
 
 const router = express.Router();
 
@@ -27,13 +28,18 @@ router.get('/', async (req, res) => {
 // @route   POST api/configs
 // @desc    Add a config
 // @access  Private
-router.post('/', async (req, res) => {
+router.post('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
 
   // Check Authorization
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { key, values } = req.body;
 
@@ -55,11 +61,17 @@ router.post('/', async (req, res) => {
 // @route   PATCH api/configss?id=
 // @desc    Update a config
 // @access  Private
-router.patch('/', async (req, res) => {
+router.patch('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
+
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { id } = req.query;
   const { key, values } = req.body;
@@ -117,11 +129,17 @@ router.get('/search', async (req, res) => {
 // @route   DELETE api/configs?id=
 // @desc    DELETE a config
 // @access  Private
-router.delete('/', async (req, res) => {
+router.delete('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
+
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { id } = req.query;
 

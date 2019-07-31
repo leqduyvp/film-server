@@ -2,6 +2,7 @@ const express = require('express');
 
 const { getAllBannersService, addBannerService, updateBannerService, deleteBannerService } = require('../service/banner.service');
 const { checkBanner, checkId } = require('../service/banner.validate');
+const authToken = require('../service/token.auth');
 
 const router = express.Router();
 
@@ -31,13 +32,19 @@ router.get('/', async (req, res) => {
 // @route   POST api/banners
 // @desc    Add a banner
 // @access  Private
-router.post('/', async (req, res) => {
+router.post('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
 
+
   // Check Authorization
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { image, action, payload } = req.body;
   const input = {
@@ -64,13 +71,18 @@ router.post('/', async (req, res) => {
 // @route   PATCH api/banners?id=
 // @desc    Update a banner
 // @access  Private
-router.patch('/', async (req, res) => {
+router.patch('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
 
   // Check Authorization
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { id } = req.query;
   const { image, action, payload } = req.body;
@@ -104,13 +116,18 @@ router.patch('/', async (req, res) => {
 // @route   DELETE api/banners?id=
 // @desc    Delete a banner
 // @access  Private
-router.delete('/', async (req, res) => {
+router.delete('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
 
   // Check Authorization
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { id } = req.query;
 
