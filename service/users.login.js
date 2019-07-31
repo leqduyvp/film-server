@@ -1,6 +1,7 @@
 const phone = require('phone');
 const { findUserByCredentials } = require('../database/users');
 const generateToken = require('./token.generate');
+const otpGenerate = require('./otp.generate');
 
 const validCredentials = (req) => {
   if ((!req.body.email && !req.body.phone) || !req.body.password)
@@ -30,13 +31,16 @@ module.exports = async (req, res, next) => {
       return res.status(400).send({ error: user.error });
     }
     if (!user.activated) {
+      const otp = await otpGenerate(user._id);
+
       return res.status(400).send({
         error: {
           isError: true, errorMessage: {
             activation: 'User has not activated'
           }
         },
-        userId: user._id.toString()
+        userId: user._id.toString(),
+        otp
       });
     }
     const platform = req.get('platform');

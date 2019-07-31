@@ -44,4 +44,4 @@ app.use('/api/films', films);
 app.use('/api/users', users);
 app.use('/api/rate', rates)
 module.exports = app;
-// app.listen(port, () => console.log(`Server running on port: ${port}`));
+app.listen(port, () => console.log(`Server running on port: ${port}`));

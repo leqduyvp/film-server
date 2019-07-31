@@ -19,9 +19,10 @@ module.exports = async (req, res) => {
       });
     }
 
-    await otpGenerate(user._id);
+    const otp = await otpGenerate(user._id);
     res.status(201).send({
       userId: user._id,
+      otp,
       error: {
         isError: false,
         errorMessage: {}
