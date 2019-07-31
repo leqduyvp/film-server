@@ -6,7 +6,7 @@ const cors = require('cors');
 
 const { port } = require('./config/server.config');
 const { dbURI } = require('./config/database.config');
-const {client} = require('./service/redis.connection');
+const { client } = require('./service/redis.connection');
 
 const categories = require('./router/category');
 const banners = require('./router/banner');
@@ -33,7 +33,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-mongoose.connect(dbURI, { useNewUrlParser: true, useFindAndModify: false })
+mongoose.connect(dbURI, { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true })
   .then(() => console.log('Database connected...'))
   .catch(error => console.log('Can not connect to database: ', error.message));
 
