@@ -12,14 +12,14 @@ router.get('/', async (req, res) => {
   // Get data
   const { error, banners } = await getAllBannersService();
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
   if (!banners || banners.length === 0) {
     error.isError = true;
     error.errorMessage.banners = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
@@ -49,16 +49,16 @@ router.post('/', async (req, res) => {
   // Check input
   error = checkBanner(input);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Store data
   error = await addBannerService(input);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(201).send(error);
+  return res.status(201).send({ error });
 });
 
 // @route   PATCH api/banners?id=
@@ -83,22 +83,22 @@ router.patch('/', async (req, res) => {
   // Check id
   error = checkId(id);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Check input
   error = checkBanner(input);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Update data
   error = await updateBannerService(id, input);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 });
 
 // @route   DELETE api/banners?id=
@@ -117,15 +117,15 @@ router.delete('/', async (req, res) => {
   // Check id
   error = checkId(id);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   error = await deleteBannerService(id);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 });
 
 

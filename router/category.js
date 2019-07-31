@@ -12,14 +12,14 @@ router.get('/', async (req, res) => {
   // Get data
   const { error, categories } = await getAllCategoriesService();
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
   if (!categories || categories.length === 0) {
     error.isError = true;
     error.errorMessage.categories = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
@@ -44,16 +44,16 @@ router.post('/', async (req, res) => {
   // Check input data
   error = checkInput(parentCategory, childrenCategories);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Store data
   error = await addCategoryService(parentCategory, childrenCategories);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(201).send(error);
+  return res.status(201).send({ error });
 });
 
 // @route   PATCH api/categories?id=
@@ -71,22 +71,22 @@ router.patch('/', async (req, res) => {
   // Check id
   error = checkId(id);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Check input data
   error = checkInput(parentCategory, childrenCategories);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Update category
   error = await updateCategoryService(id, parentCategory, childrenCategories);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 
 });
 
@@ -104,16 +104,16 @@ router.delete('/', async (req, res) => {
   // Check id
   error = checkId(id);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Delete a category
   error = await deleteCategoryService(id);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 });
 
 module.exports = router;
