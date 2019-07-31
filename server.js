@@ -12,6 +12,7 @@ const categories = require('./router/category');
 const banners = require('./router/banner');
 const configs = require('./router/config');
 const films = require('./router/film');
+const users = require('./router/users.router');
 
 // Create Redis Client
 const client = redis.createClient({
@@ -45,5 +46,6 @@ app.use('/api/categories', categories);
 app.use('/api/banners', banners);
 app.use('/api/configs', configs);
 app.use('/api/films', films);
+app.use('/api/users', users);
 
 app.listen(port, () => console.log(`Server running on port: ${port}`));
