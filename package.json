@@ -7,11 +7,7 @@
     "test": "test"
   },
   "scripts": {
-<<<<<<< HEAD
-    "test": "jest --detectOpenHandles --watch",
-=======
-    "test": "jest --watch --runInBand",
->>>>>>> feature/category
+    "test": "jest --detectOpenHandles --watch --runInBand",
     "start": "node server.js",
     "server": "nodemon server.js"
   },

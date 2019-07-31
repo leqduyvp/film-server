@@ -1,45 +1,5 @@
 const { getAllBannersFromCache, setAllBannersToCache } = require('../service/banner.cache');
 const { getAllBanners, addBanner, updateBanner, deleteBanner } = require('../database/banner');
-<<<<<<< HEAD
-=======
-const { checkString } = require('../utils/checkString');
-
-const checkBannerService = imageLink => {
-  let error = {
-    isError: false,
-    errorMessage: {}
-  }
-
-  const err = checkString(imageLink);
-
-  if (err.isError) {
-    error.isError = true;
-    error.errorMessage.image = 'image link ' + err.message;
-
-    return error;
-  }
-
-  return error;
-}
-
-const checkIdService = id => {
-  let error = {
-    isError: false,
-    errorMessage: {}
-  }
-
-  const err = checkString(id);
-
-  if (err.isError) {
-    error.isError = true;
-    error.errorMessage.id = 'id ' + err.message;
-
-    return error;
-  }
-
-  return error;
-}
->>>>>>> feature/category
 
 const getAllBannersService = async () => {
   let error = {
