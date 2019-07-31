@@ -17,6 +17,20 @@ const makeKey = (input, page, records, fields) => {
   return key;
 }
 
+const makeKeyTotal = (input, fields) => {
+  let key = '';
+
+  fields.forEach(field => {
+    if (input[field]) {
+      key += field + '|' + input[field].toString().trim().toLowerCase() + '/';
+    } else {
+      key += field + '|' + input[field] + '/';
+    }
+  });
+
+  return key;
+}
+
 const storeToRedis = (key, value, timeout) => {
   const valueString = JSON.stringify(value);
   client.setex(key, timeout, valueString, () => {
@@ -37,6 +51,7 @@ const getDataFromRedis = key => {
 
 module.exports = {
   makeKey,
+  makeKeyTotal,
   storeToRedis,
   getDataFromRedis
 }

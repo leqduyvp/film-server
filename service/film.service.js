@@ -75,26 +75,22 @@ const filterFilmsService = async (input, page, records) => {
   }
 
   try {
-    let films = [];
+    let data = {};
 
     // Get films in cache
-    films = await getFilterFilmsFromCache(input, page, records);
-    if (films) {
-      return {
-        error,
-        films
-      }
+    data = await getFilterFilmsFromCache(input, page, records);
+    if (!data) {
+      // If there isn't in cache, get it in database
+      data = await filterFilm(input, page, records);
+
+      // Set films to cache
+      setFilterFilmsToCache(input, page, records, data);
     }
-
-    // If there isn't in cache, get it in database
-    films = await filterFilm(input, page, records);
-
-    // Set films to cache
-    setFilterFilmsToCache(input, page, records, films);
 
     return {
       error,
-      films
+      films: data.films,
+      totalRecords: data.totalRecords
     }
   } catch (err) {
     error.isError = true;
@@ -113,26 +109,22 @@ const searchFilmByFieldService = async (input, page, records) => {
   }
 
   try {
-    let films = [];
+    let data = {};
 
     // Get films in cache
-    films = await getSearchFilmByFieldFromCache(input, page, records);
-    if (films) {
-      return {
-        error,
-        films
-      }
+    data = await getSearchFilmByFieldFromCache(input, page, records);
+    if (!data) {
+      // If there isn't in cache, search in database
+      data = await searchFilmByField(input, page, records);
+
+      // Set films to cache
+      setSearchFilmByFieldToCache(input, page, records, data);
     }
-
-    // If there isn't in cache, search in database
-    films = await searchFilmByField(input, page, records);
-
-    // Set films to cache
-    setSearchFilmByFieldToCache(input, page, records, films);
 
     return {
       error,
-      films
+      films: data.films,
+      totalRecords: data.totalRecords
     }
   } catch (err) {
     error.isError = true;
@@ -151,26 +143,22 @@ const getAllFilmsService = async (page, records) => {
   }
 
   try {
-    let films = [];
+    let data = {};
 
     // Get films in cache
-    films = await getAllFilmsFromCache(page, records);
-    if (films) {
-      return {
-        error,
-        films
-      }
+    data = await getAllFilmsFromCache(page, records);
+    if (!data) {
+      // If there isn't in cache, search in database
+      data = await getAllFilms(page, records);
+
+      // Set films to cache
+      setAllFilmsToCache(page, records, data);
     }
-
-    // If there isn't in cache, search in database
-    films = await getAllFilms(page, records);
-
-    // Set films to cache
-    setAllFilmsToCache(page, records, films);
 
     return {
       error,
-      films
+      films: data.films,
+      totalRecords: data.totalRecords
     }
   } catch (err) {
     error.isError = true;
@@ -189,26 +177,25 @@ const searchFilmService = async (value, page, records) => {
   }
 
   try {
-    let films = [];
-
-    // Get films in cache
-    films = await getSearchFilmsFromCache(value, page, records);
-    if (films) {
-      return {
-        error,
-        films
-      }
+    let data = {};
+    const input = {
+      value
     }
 
-    // If there isn't in cache, search in database
-    films = await searchFilm(value, page, records);
+    // Get films in cache
+    data = await getSearchFilmsFromCache(input, page, records);
+    if (!data) {
+      // If there isn't in cache, search in database
+      data = await searchFilm(input, page, records);
 
-    // Set films to cache
-    setSearchFilmsToCache(value, page, records, films);
+      // Set films to cache
+      setSearchFilmsToCache(input, page, records, data);
+    }
 
     return {
       error,
-      films
+      films: data.films,
+      totalRecords: data.totalRecords
     }
   } catch (err) {
     error.isError = true;
@@ -248,26 +235,22 @@ const getRelatedFilmsService = async (id, page, records) => {
   }
 
   try {
-    let films = [];
+    let data = {};
 
     // Get films in cache
-    films = await getRelatedFilmsFromCache(id, page, records);
-    if (films) {
-      return {
-        error,
-        films
-      }
+    data = await getRelatedFilmsFromCache(id, page, records);
+    if (!data) {
+      // If there isn't in cache, search in database
+      data = await getRelatedFilms(id, page, records);
+
+      // // Set films to cache
+      setRelatedFilmsToCache(id, page, records, data);
     }
-
-    // If there isn't in cache, search in database
-    films = await getRelatedFilms(id, page, records);
-
-    // // Set films to cache
-    setRelatedFilmsToCache(id, page, records, films);
 
     return {
       error,
-      films
+      films: data.films,
+      totalRecords: data.totalRecords
     }
   } catch (err) {
     error.isError = true;
