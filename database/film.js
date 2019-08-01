@@ -42,7 +42,7 @@ const getAllFilms = async (page = pageNumber, records = recordsNumber) => {
   }
 }
 
-const addFilm = input => {
+const addFilm = async input => {
   const film = new Film({
     title: input.title,
     supportedResolution: input.supportedResolution,
@@ -72,7 +72,11 @@ const addFilm = input => {
     ratingNumber: 0
   });
 
-  rate.save();
+  try {
+    await rate.save();
+  } catch (error) {
+    console.log(error.message);
+  }
 
   return film.save();
 }
@@ -105,9 +109,9 @@ const filterFilm = async (input, page = pageNumber, records = recordsNumber) => 
 
   if (!totalRecords && totalRecords !== 0) {
     // Get total records in db
-    totalRecords = await Film.countDocuments({
+    totalRecords = await Film.count({
       ...query,
-      $expr: where
+      $where: where
     });
 
     // Set total records to cache

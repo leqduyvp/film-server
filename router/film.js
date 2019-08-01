@@ -160,6 +160,8 @@ router.get('/filter', async (req, res) => {
     year
   }
 
+  console.log(input)
+
   // Check pagination
   let check = checkPagination(page, records);
   if (check.isError) {
