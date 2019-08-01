@@ -15,7 +15,7 @@ const FilmSchema = new Schema({
   dateReleased: {
     type: Date,
     required: false,
-    default: null
+    default: Date.now()
   },
   dateCreated: {
     type: Date,

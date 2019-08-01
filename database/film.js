@@ -1,5 +1,6 @@
 // Loasd film model
 const Film = require('../database/Film.model');
+const Rate = require('./rate.model');
 const { pageNumber, recordsNumber } = require('../config/film.config');
 const {
   setTotalAllFilmsToCache,
@@ -62,11 +63,16 @@ const addFilm = input => {
     thumb: input.thumb,
     type: input.type,
     links: input.links,
-    ratingNumber: input.ratingNumber,
-    views: input.views,
     tags: input.tags,
     content: input.content
   });
+
+  const rate = new Rate({
+    filmId: film._id,
+    ratingNumber: 0
+  });
+
+  rate.save();
 
   return film.save();
 }
@@ -154,7 +160,7 @@ const filterFilm = async (input, page = pageNumber, records = recordsNumber) => 
   let films = await Film
     .find({
       ...query,
-      $expr: where
+      $where: where
     })
     .sort({ ...sort })
     .skip((page - 1) * records)
