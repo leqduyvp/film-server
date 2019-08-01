@@ -8,13 +8,16 @@ const {
   searchFilmByFieldService,
   searchFilmService,
   deleteFilmService,
-  getRelatedFilmsService
+  getRelatedFilmsService,
+  updateFilmService
 } = require('../service/film.service');
 const {
   checkAddFilmInput,
   checkId,
   checkPagination,
-  checkSearchFilmByField
+  checkSearchFilmByField,
+  checkSearchFilm,
+  checkUpdateFilmInput
 } = require('../service/film.validate');
 
 const router = express.Router();
@@ -28,28 +31,29 @@ router.get('/', async (req, res) => {
   // Check pagination
   let check = checkPagination(page, records);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
-  const { error, films } = await getAllFilmsService(page, records);
+  const { error, films, totalRecords } = await getAllFilmsService(page, records);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
   if (!films || films.length === 0) {
     error.isError = true;
     error.errorMessage.films = 'Not Found';
 
-    return res.status(404).send(error)
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
     error,
-    films
+    films,
+    totalRecords
   });
 })
 
-// @route   GET api/films
+// @route   POST api/films
 // @desc    Add a film
 // @access  Private
 router.post('/', async (req, res) => {
@@ -62,17 +66,48 @@ router.post('/', async (req, res) => {
 
   error = checkAddFilmInput(input);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Store data
   error = await addFilmService(input);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(201).send(error);
+  return res.status(201).send({ error });
 });
+
+// @route   PATCH api/films
+// @desc    Update a film
+// @access  Private
+router.patch('/', async (req, res) => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  };
+
+  const { id } = req.query;
+  const input = { ...req.body };
+
+  error = checkId(id);
+  if (error.isError) {
+    return res.status(400).send({ error });
+  }
+
+  error = checkUpdateFilmInput(input);
+  if (error.isError) {
+    return res.status(400).send({ error });
+  }
+
+  // // Store data
+  // error = await updateFilmService(input);
+  // if (error.isError) {
+  //   return res.status(500).send({ error });
+  // }
+
+  return res.status(201).send({ error });
+})
 
 // @route   GET api/films/id?id=
 // @desc    Get films by id
@@ -82,19 +117,19 @@ router.get('/id', async (req, res) => {
 
   const check = checkId(id);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
   const { error, film } = await getFilmByIdService(id);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
   if (!film) {
     error.isError = true;
     error.errorMessage.film = 'Not Found';
 
-    return res.status(404).send(error)
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
@@ -103,7 +138,7 @@ router.get('/id', async (req, res) => {
   });
 });
 
-// @route   GET api/films/filter?page=?records=?
+// @route   GET api/films/filter?page=&records=&category=&arrange=&country=&type=&year=
 // @desc    Filter film
 // @access  Public
 router.get('/filter', async (req, res) => {
@@ -128,24 +163,25 @@ router.get('/filter', async (req, res) => {
   // Check pagination
   let check = checkPagination(page, records);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
-  const { error, films } = await filterFilmsService(input, page, records);
+  const { error, films, totalRecords } = await filterFilmsService(input, page, records);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
   if (!films || films.length === 0) {
     error.isError = true;
     error.errorMessage.films = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
     error,
-    films
+    films,
+    totalRecords
   });
 });
 
@@ -168,31 +204,32 @@ router.get('/field', async (req, res) => {
   // Check pagination
   let check = checkPagination(page, records);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
   // Check input
   check = checkSearchFilmByField(input);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
-  const { error, films } = await searchFilmByFieldService(input, page, records);
+  const { error, films, totalRecords } = await searchFilmByFieldService(input, page, records);
 
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
   if (!films || films.length === 0) {
     error.isError = true;
     error.errorMessage.films = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
     error,
-    films
+    films,
+    totalRecords
   });
 
 });
@@ -206,25 +243,32 @@ router.get('/search', async (req, res) => {
   // Check pagination
   let check = checkPagination(page, records);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
-  const { error, films } = await searchFilmService(value, page, records);
+  // Check input
+  check = checkSearchFilm(value);
+  if (check.isError) {
+    return res.status(400).send({ error: check });
+  }
+
+  const { error, films, totalRecords } = await searchFilmService(value, page, records);
 
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
   if (!films || films.length === 0) {
     error.isError = true;
     error.errorMessage.films = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
     error,
-    films
+    films,
+    totalRecords
   });
 });
 
@@ -244,15 +288,15 @@ router.delete('/', async (req, res) => {
   // Check id
   error = checkId(id);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   error = await deleteFilmService(id);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 });
 
 // @route   GET api/films/related?id=
@@ -264,30 +308,31 @@ router.get('/related', async (req, res) => {
   // Check id
   let check = checkId(id);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
   // Check pagination
   check = checkPagination(page, records);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
-  const { error, films } = await getRelatedFilmsService(id, page, records);
+  const { error, films, totalRecords } = await getRelatedFilmsService(id, page, records);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
   if (!films) {
     error.isError = true;
     error.errorMessage.film = 'Not Found';
 
-    return res.status(404).send(error)
+    return res.status(404).send({ error })
   }
 
   return res.status(200).send({
     error,
-    films
+    films,
+    totalRecords
   });
 })
 

@@ -109,10 +109,76 @@ const checkSearchFilmByField = input => {
   return error;
 }
 
+const checkSearchFilm = value => {
+  const error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  const err = checkString(value);
+
+  if (err.isError) {
+    error.isError = true;
+    error.errorMessage.value = 'value ' + err.message;
+
+    return error;
+  }
+
+  return error;
+}
+
+const checkUpdateFilmInput = input => {
+  let error = {
+    isError: false,
+    errorMessage: {}
+  }
+
+  if (!Object.keys(input).length) {
+    error.isError = true;
+    error.errorMessage.input = 'input is empty';
+
+    return error;
+  }
+
+  // Required fields
+  const fields = [
+    'title',
+    'supportedResolution',
+    'dateReleased',
+    'dateUpdated',
+    'category',
+    'country',
+    'time',
+    'episodeNumber',
+    'scripts',
+    'directors',
+    'characters',
+    'description',
+    'image',
+    'thumb',
+    'type',
+    'tags'
+  ];
+
+  fields.forEach(field => {
+    if (input[field]) {
+      if (input[field] === '' || input[field].length === 0) {
+        error.isError = true;
+        error.errorMessage[field] = field + ' must not be empty';
+      }
+
+      return error;
+    }
+  });
+
+  return error;
+}
 
 module.exports = {
   checkPagination,
   checkAddFilmInput,
   checkId,
-  checkSearchFilmByField
+  checkSearchFilmByField,
+  checkSearchFilm,
+  checkUpdateFilmInput
 }

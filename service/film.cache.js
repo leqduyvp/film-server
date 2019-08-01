@@ -1,4 +1,4 @@
-const { client } = require('./redis.connection');
+const { getDataFromRedis, storeToRedis } = require('../utils/redis');
 
 const {
   timeoutFilterFilms,
@@ -6,15 +6,23 @@ const {
   timeoutSearchFilmByField,
   timeoutAllFilms,
   timeoutSearchFilm,
-  timeoutRelatedFilms } = require('../config/redis.config');
+  timeoutRelatedFilms,
+  timeoutTotalAllFilms,
+  timeoutTotalFilterFilms,
+  timeoutTotalSearchFilmsByField,
+  timeoutTotalSeachFilms,
+  timeoutTotalRelatedFilms
+} = require('../config/redis.config');
 const { pageNumber, recordsNumber } = require('../config/film.config');
-const { makeKey } = require('../utils/makeKeyRedis');
+const { makeKey, makeKeyTotal } = require('../utils/redis');
 
-const fieldsFilter = ['category', 'arrange', 'country', 'type', 'year'];
-const fieldsSearch = ['field', 'value'];
+const fieldsFilterFilms = ['category', 'arrange', 'country', 'type', 'year'];
+const fieldsSearchFilmsByField = ['field', 'value'];
 const fieldsAllFilms = ['allFilms'];
 const fieldSearchFilm = ['value'];
 const fieldRelatedFilms = ['id'];
+
+// ================================ FILTER FILM ================================
 
 const setFilterFilmsToCache = (input, page = pageNumber, records = recordsNumber, films) => {
   // If page <= 10, cache films, else dont cache
@@ -24,12 +32,9 @@ const setFilterFilmsToCache = (input, page = pageNumber, records = recordsNumber
 
   console.log('set filter films to cache');
 
-  const key = makeKey(input, page, records, fieldsFilter);
+  const key = makeKey(input, page, records, fieldsFilterFilms);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutFilterFilms, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutFilterFilms);
 }
 
 const getFilterFilmsFromCache = (input, page = pageNumber, records = recordsNumber) => {
@@ -38,19 +43,30 @@ const getFilterFilmsFromCache = (input, page = pageNumber, records = recordsNumb
     return;
   }
 
-  console.log('get filter films in cache');
+  const key = makeKey(input, page, records, fieldsFilterFilms);
 
-  const key = makeKey(input, page, records, fieldsFilter);
+  console.log('get filter films in cache', key);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
+
+const setTotalFilterFilmsToCache = (input, totalRecords) => {
+  console.log('set total filter films to cache');
+
+  const key = makeKeyTotal(input, fieldsFilterFilms);
+
+  storeToRedis(key, totalRecords, timeoutTotalFilterFilms);
+}
+
+const getTotalFilterFilmsFromCache = input => {
+  console.log('get total filter films from cache');
+
+  const key = makeKeyTotal(input, fieldsFilterFilms);
+
+  return getDataFromRedis(key);
+}
+
+// ================================ SEARCH FILM BY FIELD ================================
 
 const setSearchFilmByFieldToCache = (input, page = pageNumber, records = recordsNumber, films) => {
   // If page <= 10, cache films, else dont cache
@@ -60,12 +76,9 @@ const setSearchFilmByFieldToCache = (input, page = pageNumber, records = records
 
   console.log('set searched films by field to cache');
 
-  const key = makeKey(input, page, records, fieldsSearch);
+  const key = makeKey(input, page, records, fieldsSearchFilmsByField);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutSearchFilmByField, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutSearchFilmByField);
 }
 
 const getSearchFilmByFieldFromCache = (input, page = pageNumber, records = recordsNumber) => {
@@ -76,17 +89,28 @@ const getSearchFilmByFieldFromCache = (input, page = pageNumber, records = recor
 
   console.log('get searched films by field in cache');
 
-  const key = makeKey(input, page, records, fieldsSearch);
+  const key = makeKey(input, page, records, fieldsSearchFilmsByField);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
+
+const setTotalSearchFilmsByFieldToCache = (input, totalRecords) => {
+  console.log('set total search films by field to cache');
+
+  const key = makeKeyTotal(input, fieldsSearchFilmsByField);
+
+  storeToRedis(key, totalRecords, timeoutTotalSearchFilmsByField);
+}
+
+const getTotalSearchFilmsByFieldFromCache = input => {
+  console.log('get total search films by field from cache');
+
+  const key = makeKeyTotal(input, fieldsSearchFilmsByField);
+
+  return getDataFromRedis(key);
+}
+
+// ================================ ALL FILMS ================================
 
 const setAllFilmsToCache = (page = pageNumber, records = recordsNumber, films) => {
   // If page <= 10, cache films, else dont cache
@@ -98,10 +122,7 @@ const setAllFilmsToCache = (page = pageNumber, records = recordsNumber, films) =
 
   const key = makeKey({}, page, records, fieldsAllFilms);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutAllFilms, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutAllFilms);
 }
 
 const getAllFilmsFromCache = (page = pageNumber, records = recordsNumber) => {
@@ -114,17 +135,28 @@ const getAllFilmsFromCache = (page = pageNumber, records = recordsNumber) => {
 
   const key = makeKey({}, page, records, fieldsAllFilms);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
 
-const setSearchFilmsToCache = (value, page = pageNumber, records = recordsNumber, films) => {
+const setTotalAllFilmsToCache = totalRecords => {
+  console.log('set total all films to cache');
+
+  const key = makeKeyTotal({}, fieldsAllFilms);
+
+  storeToRedis(key, totalRecords, timeoutTotalAllFilms);
+}
+
+const getTotalAllFilmsFromCache = () => {
+  console.log('get total all films from cache');
+
+  const key = makeKeyTotal({}, fieldsAllFilms);
+
+  return getDataFromRedis(key);
+}
+
+// ================================ SEARCH FILM ================================
+
+const setSearchFilmsToCache = (input, page = pageNumber, records = recordsNumber, films) => {
   // If page <= 10, cache films, else dont cache
   if (page > limitedPagesCache) {
     return;
@@ -132,15 +164,12 @@ const setSearchFilmsToCache = (value, page = pageNumber, records = recordsNumber
 
   console.log('set search films to cache');
 
-  const key = makeKey({ value }, page, records, fieldSearchFilm);
+  const key = makeKey({ input }, page, records, fieldSearchFilm);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutSearchFilm, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutSearchFilm);
 }
 
-const getSearchFilmsFromCache = (value, page = pageNumber, records = recordsNumber) => {
+const getSearchFilmsFromCache = (input, page = pageNumber, records = recordsNumber) => {
   // If page > limitedPagesCache, films aren't in cache
   if (page > limitedPagesCache) {
     return;
@@ -148,17 +177,28 @@ const getSearchFilmsFromCache = (value, page = pageNumber, records = recordsNumb
 
   console.log('get search films in cache');
 
-  const key = makeKey({ value }, page, records, fieldSearchFilm);
+  const key = makeKey({ input }, page, records, fieldSearchFilm);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
+
+const setTotalSearchFilmsToCache = (input, totalRecords) => {
+  console.log('set total search films to cache');
+
+  const key = makeKeyTotal(input, fieldSearchFilm);
+
+  storeToRedis(key, totalRecords, timeoutTotalSeachFilms);
+}
+
+const getTotalSearchFilmsFromCache = input => {
+  console.log('get total all films from cache');
+
+  const key = makeKeyTotal(input, fieldsAllFilms);
+
+  return getDataFromRedis(key);
+}
+
+// ================================ RELATED FILMS ================================
 
 const setRelatedFilmsToCache = (id, page = pageNumber, records = recordsNumber, films) => {
   // If page <= 10, cache films, else dont cache
@@ -170,10 +210,7 @@ const setRelatedFilmsToCache = (id, page = pageNumber, records = recordsNumber, 
 
   const key = makeKey({ id }, page, records, fieldRelatedFilms);
 
-  const filmsString = JSON.stringify(films);
-  client.setex(key, timeoutRelatedFilms, filmsString, () => {
-    console.log(key, ' are stored to cache');
-  });
+  storeToRedis(key, films, timeoutRelatedFilms);
 }
 
 const getRelatedFilmsFromCache = (id, page = pageNumber, records = recordsNumber) => {
@@ -186,28 +223,48 @@ const getRelatedFilmsFromCache = (id, page = pageNumber, records = recordsNumber
 
   const key = makeKey({ id }, page, records, fieldRelatedFilms);
 
-  return new Promise((resolve, reject) => {
-    client.get(key, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(JSON.parse(result));
-    });
-  });
+  return getDataFromRedis(key);
 }
+
+const setTotalRelatedFilmsToCache = (id, totalRecords) => {
+  console.log('set total related films to cache');
+
+  const key = makeKeyTotal({ id }, fieldRelatedFilms);
+
+  storeToRedis(key, totalRecords, timeoutTotalRelatedFilms);
+}
+
+const getTotalRelatedFilmsFromCache = id => {
+  console.log('get total related films from cache');
+
+  const key = makeKeyTotal({ id }, fieldRelatedFilms);
+
+  return getDataFromRedis(key);
+}
+
 module.exports = {
   setFilterFilmsToCache,
   getFilterFilmsFromCache,
+  setTotalFilterFilmsToCache,
+  getTotalFilterFilmsFromCache,
 
   setSearchFilmByFieldToCache,
   getSearchFilmByFieldFromCache,
+  setTotalSearchFilmsByFieldToCache,
+  getTotalSearchFilmsByFieldFromCache,
 
   setAllFilmsToCache,
   getAllFilmsFromCache,
+  setTotalAllFilmsToCache,
+  getTotalAllFilmsFromCache,
 
   setSearchFilmsToCache,
   getSearchFilmsFromCache,
+  setTotalSearchFilmsToCache,
+  getTotalSearchFilmsFromCache,
 
   setRelatedFilmsToCache,
-  getRelatedFilmsFromCache
+  getRelatedFilmsFromCache,
+  setTotalRelatedFilmsToCache,
+  getTotalRelatedFilmsFromCache
 }

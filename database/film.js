@@ -1,15 +1,44 @@
 // Loasd film model
 const Film = require('../database/Film.model');
 const { pageNumber, recordsNumber } = require('../config/film.config');
+const {
+  setTotalAllFilmsToCache,
+  getTotalAllFilmsFromCache,
+  setTotalFilterFilmsToCache,
+  getTotalFilterFilmsFromCache,
+  setTotalSearchFilmsByFieldToCache,
+  getTotalSearchFilmsByFieldFromCache,
+  setTotalSearchFilmsToCache,
+  getTotalSearchFilmsFromCache,
+  setTotalRelatedFilmsToCache,
+  getTotalRelatedFilmsFromCache
 
-const getAllFilms = (page = pageNumber, records = recordsNumber) => {
+} = require('../service/film.cache');
+
+const getAllFilms = async (page = pageNumber, records = recordsNumber) => {
   page = Number.parseInt(page);
   records = Number.parseInt(records);
 
-  return Film
+  // Get total records in cache
+  totalRecords = await getTotalAllFilmsFromCache();
+
+  if (!totalRecords && totalRecords !== 0) {
+    // Get total records in db
+    totalRecords = await Film.countDocuments({});
+
+    // Set total records to cache
+    setTotalAllFilmsToCache(totalRecords);
+  }
+
+  const films = await Film
     .find({})
     .skip((page - 1) * records)
     .limit(records);
+
+  return {
+    films,
+    totalRecords
+  }
 }
 
 const addFilm = input => {
@@ -46,115 +75,167 @@ const getFilmById = id => {
   return Film.findById(id);
 }
 
-const filterFilm = (input, page = pageNumber, records = recordsNumber) => {
+const filterFilm = async (input, page = pageNumber, records = recordsNumber) => {
   page = Number.parseInt(page);
   records = Number.parseInt(records);
 
   const fields = ['category', 'country', 'type'];
-  let filters = {};
+  let query = {};
+  let where = null;
+  let totalRecords = 0;
+  let sort = {};
 
   fields.forEach(field => {
     if (input[field]) {
       // Make regex to ignore case
-      filters[field] = new RegExp(input[field], 'i');
+      query[field] = new RegExp(input[field], 'i');
     }
   });
 
-  let filterFilms = Film
-    .find({
-      '$where': `${input.year} ? this.dateReleased.getFullYear() == ${input.year} : /./`,
-      ...filters
-    })
-    .skip((page - 1) * records)
-    .limit(records);
+  where = input.year ? `this.dateReleased.getFullYear() == ${input.year}` : `/./`;
 
-  if (!input.arrange && input.arrange !== 0) {
-    console.log('no sort')
-    return filterFilms;
+  // Get total records in cache
+  totalRecords = await getTotalFilterFilmsFromCache(input);
+
+  if (!totalRecords && totalRecords !== 0) {
+    // Get total records in db
+    totalRecords = await Film.countDocuments({
+      ...query,
+      $expr: where
+    });
+
+    // Set total records to cache
+    setTotalFilterFilmsToCache(input, totalRecords);
   }
 
   switch (input.arrange) {
     case 0:
       // Sort by dateCreated
       console.log('sort by dateCreate:');
-      return filterFilms.sort({
-        dateCreated: -1
-      });
+      sort = { dateCreated: -1 };
+      break;
 
     case 1:
       // Sort by dateReleased
       console.log('sort by dateReleased:');
-      return filterFilms.sort({
-        dateReleased: -1
-      });
+      sort = { dateReleased: -1 };
+      break;
 
     case 2:
       // Sort by title
       console.log('sort by title:');
-      return filterFilms.sort({
-        title: 1
-      });
+      sort = { title: 1 };
+      break;
 
     case 3:
       // Sort by imdb
       console.log('sort by imdb:');
-      return filterFilms.sort({
-        imdb: -1
-      });
+      sort = { imdb: -1 };
+      break;
 
     case 4:
       // Sort by views
       console.log('sort by views:');
-      return filterFilms.sort({
-        views: -1
-      });
+      sort = { views: -1 };
+      break;
 
     case 5:
       //  Sort by ratingNumber
       console.log('sort by ratingNumber:');
-      return filterFilms.sort({
-        ratingNumber: -1
-      })
+      sort = { ratingNumber: -1 };
+      break;
 
     default:
       // Sort by title
       console.log('sort by title:');
-      return filterFilms.sort({
-        title: -1
-      });
+      sort = { title: -1 };
   }
+
+  let films = await Film
+    .find({
+      ...query,
+      $expr: where
+    })
+    .sort({ ...sort })
+    .skip((page - 1) * records)
+    .limit(records);
+
+  return {
+    films,
+    totalRecords
+  };
 }
 
-const searchFilmByField = (input, page = pageNumber, records = recordsNumber) => {
+const searchFilmByField = async (input, page = pageNumber, records = recordsNumber) => {
   page = Number.parseInt(page);
   records = Number.parseInt(records);
 
   const { field, value } = input;
-  const search = {};
+  let query = {};
+  let totalRecords = 0;
 
   // Make regex to ignore case
-  search[field] = new RegExp(value, 'i');
+  query[field] = new RegExp(value, 'i');
 
-  return Film
+  // Get total records in cache
+  totalRecords = await getTotalSearchFilmsByFieldFromCache(input);
+
+  if (!totalRecords && totalRecords !== 0) {
+    // Get total records in db
+    totalRecords = await Film.countDocuments({
+      ...query
+    });
+
+    // Set total records to cache
+    setTotalSearchFilmsByFieldToCache(input, totalRecords);
+  }
+
+  const films = await Film
     .find({
-      ...search
+      ...query
     })
     .skip((page - 1) * records)
     .limit(records);
+
+  return {
+    films,
+    totalRecords
+  }
 }
 
 const deleteFilm = id => {
   return Film.findByIdAndRemove(id);
 }
 
-const searchFilm = (value, page = pageNumber, records = recordsNumber) => {
+const searchFilm = async (input, page = pageNumber, records = recordsNumber) => {
   page = Number.parseInt(page);
   records = Number.parseInt(records);
 
   // Make regex to ignore case
-  search = new RegExp(value, 'i');
+  search = new RegExp(input.value, 'i');
 
-  return Film
+  let totalRecords = 0
+
+  // Get total records in cache
+  totalRecords = await getTotalSearchFilmsFromCache(input);
+
+  if (!totalRecords && totalRecords !== 0) {
+    // Get total records in db
+    totalRecords = await Film.countDocuments({
+      $or: [
+        { "title.title_vn": search },
+        { "title.title_en": search },
+        { directors: search },
+        { characters: search },
+        { tags: search }
+      ]
+    });
+
+    // Set total records to cache
+    setTotalSearchFilmsToCache(input, totalRecords);
+  }
+
+  const films = await Film
     .find({
       $or: [
         { "title.title_vn": search },
@@ -166,6 +247,11 @@ const searchFilm = (value, page = pageNumber, records = recordsNumber) => {
     })
     .skip((page - 1) * records)
     .limit(records);
+
+  return {
+    films,
+    totalRecords
+  }
 }
 
 const getRelatedFilms = async (id, page = pageNumber, records = recordsNumber) => {
@@ -174,8 +260,10 @@ const getRelatedFilms = async (id, page = pageNumber, records = recordsNumber) =
 
   const currentFilm = await Film.findById(id);
 
-  const fields = ['tags', 'directors', 'characters'];
-  const filter = [];
+  // const fields = ['tags', 'directors', 'characters'];
+  const fields = ['tags'];
+  let filter = [];
+  let totalRecords = 0;
 
   fields.forEach(field => {
     const key = currentFilm[field];
@@ -190,7 +278,22 @@ const getRelatedFilms = async (id, page = pageNumber, records = recordsNumber) =
     }
   });
 
-  return Film
+  // Get total records in cache
+  totalRecords = await getTotalRelatedFilmsFromCache(id);
+
+  if (!totalRecords && totalRecords !== 0) {
+    // Get total records in db
+    totalRecords = await Film.countDocuments({
+      $or: [
+        ...filter
+      ]
+    });
+
+    // Set total records to cache
+    setTotalRelatedFilmsToCache(id, totalRecords);
+  }
+
+  const films = await Film
     .find({
       $or: [
         ...filter
@@ -199,6 +302,10 @@ const getRelatedFilms = async (id, page = pageNumber, records = recordsNumber) =
     .skip((page - 1) * records)
     .limit(records);
 
+  return {
+    films,
+    totalRecords
+  }
 }
 
 module.exports = {

@@ -16,4 +16,11 @@ module.exports = {
   timeoutAllFilms: 10,                      // seconds
   timeoutSearchFilm: 10,                    // seconds
   timeoutRelatedFilms: 10,                  // seconds
+
+  // Total films
+  timeoutTotalAllFilms: 10,                  // seconds
+  timeoutTotalFilterFilms: 10,               // seconds
+  timeoutTotalSearchFilmsByField: 10,        // seconds
+  timeoutTotalSeachFilms: 10,                // seconds
+  timeoutTotalRelatedFilms: 10               // seconds
 }
