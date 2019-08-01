@@ -42,7 +42,6 @@ const checkAddFilmInput = input => {
     'title',
     'category',
     'episodeNumber',
-    'scripts',
     'directors',
     'characters',
     'description',
@@ -50,8 +49,6 @@ const checkAddFilmInput = input => {
     'thumb',
     'type',
     'links',
-    'ratingNumber',
-    'views',
     'tags'
   ];
 

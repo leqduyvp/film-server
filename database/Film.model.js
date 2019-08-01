@@ -54,7 +54,7 @@ const FilmSchema = new Schema({
   },
   scripts: {
     type: Array,
-    required: true
+    required: false
   },
   directors: {
     type: Array,
