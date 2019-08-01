@@ -1,6 +1,7 @@
 const express = require('express');
 
 const { checkInputService, checkIdService, checkKeyService, getAllConfigsService, addConfigService, updateConfigService, searchConfigByKeyService, deleteConfigService } = require('../service/config.service');
+const authToken = require('../service/token.auth');
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
     error.isError = true;
     error.errorMessage.configs = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
@@ -27,39 +28,50 @@ router.get('/', async (req, res) => {
 // @route   POST api/configs
 // @desc    Add a config
 // @access  Private
-router.post('/', async (req, res) => {
+router.post('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
 
   // Check Authorization
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { key, values } = req.body;
 
   // Check input data
   error = checkInputService(key, values);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Store data
   error = await addConfigService(key, values);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(201).send(error);
+  return res.status(201).send({ error });
 });
 
 // @route   PATCH api/configss?id=
 // @desc    Update a config
 // @access  Private
-router.patch('/', async (req, res) => {
+router.patch('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
+
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { id } = req.query;
   const { key, values } = req.body;
@@ -67,22 +79,22 @@ router.patch('/', async (req, res) => {
   // Check id
   error = checkIdService(id);
   if (error.isError === true) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Check input data
   error = checkInputService(key, values);
   if (error.isError === true) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Update category
   error = await updateConfigService(id, key, values);
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 });
 
 // @route   GET api/configs?key=
@@ -94,7 +106,7 @@ router.get('/search', async (req, res) => {
   // Check key
   const check = checkKeyService(key);
   if (check.isError) {
-    return res.status(400).send(check);
+    return res.status(400).send({ error: check });
   }
 
   // Search config in database and return to client
@@ -104,7 +116,7 @@ router.get('/search', async (req, res) => {
     error.isError = true;
     error.errorMessage.configs = 'Not Found';
 
-    return res.status(404).send(error);
+    return res.status(404).send({ error });
   }
 
   return res.status(200).send({
@@ -117,28 +129,34 @@ router.get('/search', async (req, res) => {
 // @route   DELETE api/configs?id=
 // @desc    DELETE a config
 // @access  Private
-router.delete('/', async (req, res) => {
+router.delete('/', authToken, async (req, res) => {
   let error = {
     isError: false,
     errorMessage: {}
   };
+
+  if (req.userAccType != 0) {
+    return res.status(403).send({
+      error: { isError: true, errorMessage: { authorization: 'Admin only' } }
+    })
+  }
 
   const { id } = req.query;
 
   // Check id
   error = checkIdService(id);
   if (error.isError) {
-    return res.status(400).send(error);
+    return res.status(400).send({ error });
   }
 
   // Delete a config in database
   error = await deleteConfigService(id);
 
   if (error.isError) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error });
   }
 
-  return res.status(200).send(error);
+  return res.status(200).send({ error });
 });
 
 module.exports = router;

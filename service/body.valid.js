@@ -5,13 +5,14 @@ const { findUserById, checkEmailExist, checkPhoneExist } = require('../database/
 const secret = require('../config/jwtSecret');
 
 const emailValidator = async (body, error) => {
-
-  const emailUsed = await checkEmailExist(body.email);
-
   if (!body.email || !validator.isEmail(body.email)) {
     error.isError = true;
     error.errorMessage.email = 'Invalid email'
+    return;
   }
+
+  const emailUsed = await checkEmailExist(body.email);
+
   body.email = body.email.trim();
   if (emailUsed) {
     error.isError = true;
@@ -58,9 +59,9 @@ const accTypeValidator = async (body, error) => {
 }
 
 const nameValidator = (body, error) => {
-  body.name = body.name.trim();
   if (!body.name || body.name.length < 1 || body.name.length > 32) {
     error.isError = true;
+    if (body.name) body.name = body.name.trim();
     if (!body.name) error.errorMessage.name = 'Name is missing';
     else if (body.name.length < 1) error.errorMessage.name = 'Name is too short';
     else if (body.name.length > 32) error.errorMessage.name = 'Name is too long';
@@ -101,10 +102,22 @@ const phoneValidator = async (body, error) => {
   }
 }
 
+const rateValidator = (body, error) => {
+  const rate = body.rate;
+  if (Math.floor(rate) * 10 != rate * 10) {
+    error.isError = true;
+    error.errorMessage.rate = 'Rate number is not an integer';
+  } else if (rate < 1 || rate > 5) {
+    error.isError = true;
+    error.errorMessage.rate = 'Rate number is out of range [1 .. 5]';
+  }
+}
+
 module.exports = {
   emailValidator,
   passwordValidator,
   accTypeValidator,
   nameValidator,
-  phoneValidator
+  phoneValidator,
+  rateValidator
 }

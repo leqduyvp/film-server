@@ -14,7 +14,7 @@ const addBanner = input => {
 }
 
 const updateBanner = (id, input) => {
-  console.log(id, input)
+  // console.log(id, input)
   return Banner.findByIdAndUpdate(id, {
     image: input.image,
     action: input.action,

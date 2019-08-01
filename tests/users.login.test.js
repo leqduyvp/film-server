@@ -2,12 +2,12 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
 const { setupDatabase, notActivatedUser, validNormalUser } = require('./users.dataInit');
-const app = require('../app').router;
+const app = require('../server');
 
 beforeAll(setupDatabase);
 
 test('Should log in for valid user with email', async () => {
-  const response = await request(app).post('/users/login')
+  const response = await request(app).post('/api/users/login')
     .send({
       email: validNormalUser.email,
       password: 'validuser',
@@ -21,7 +21,7 @@ test('Should log in for valid user with email', async () => {
 });
 
 test('Should log in for valid user with phone', async () => {
-  const response = await request(app).post('/users/login')
+  const response = await request(app).post('/api/users/login')
     .send({
       phone: '0912345678',
       password: 'validuser',
@@ -35,7 +35,7 @@ test('Should log in for valid user with phone', async () => {
 });
 
 test('Should not log in with wrong credentials(password) ', async () => {
-  const response = await request(app).post('/users/login')
+  const response = await request(app).post('/api/users/login')
     .send({
       email: validNormalUser.email,
       password: 'invaliduser'
@@ -49,7 +49,7 @@ test('Should not log in with wrong credentials(password) ', async () => {
 });
 
 test('Should not log in with wrong credentials(email) ', async () => {
-  const response = await request(app).post('/users/login')
+  const response = await request(app).post('/api/users/login')
     .send({
       email: 'invaliduser@valid.com',
       password: 'validuser'
@@ -63,7 +63,7 @@ test('Should not log in with wrong credentials(email) ', async () => {
 });
 
 test('Should not log in with wrong credentials(phone) ', async () => {
-  const response = await request(app).post('/users/login')
+  const response = await request(app).post('/api/users/login')
     .send({
       phone: '0961458641',
       password: 'validuser'
@@ -77,7 +77,7 @@ test('Should not log in with wrong credentials(phone) ', async () => {
 });
 
 test('Should not log in not activated account', async () => {
-  const response = await request(app).post('/users/login')
+  const response = await request(app).post('/api/users/login')
     .send({
       email: notActivatedUser.email,
       password: 'unactivated'

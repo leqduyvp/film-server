@@ -1,9 +1,9 @@
 const express = require('express');
 const router = new express.Router();
-const authToken = require('../services/token.auth');
-const rateFilm = require('../services/rate.rateFilm');
+const authToken = require('../service/token.auth');
+const rateFilm = require('../service/rate.rateFilm');
 // const changeRate = require('../services/rate.changeRate');
-const rateValid = require('../services/rate.valid');
+const rateValid = require('../service/rate.valid');
 
 router.post('/', authToken, rateValid, rateFilm);
 // (req, res) => {

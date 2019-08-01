@@ -2,12 +2,12 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
 const { setupDatabase, validNormalUser } = require('./users.dataInit');
-const app = require('../app').router;
+const app = require('../server');
 
 beforeAll(setupDatabase);
 
 test("Should get profile for authenticated user", async () => {
-  const response = await request(app).get('/users/me')
+  const response = await request(app).get('/api/users/me')
     .set('access-token', jwt.sign({ id: validNormalUser._id, platform: 'web' }, secret, { expiresIn: '2h' }))
     .send()
     .expect(200);
@@ -17,7 +17,7 @@ test("Should get profile for authenticated user", async () => {
 });
 
 test('Should not get profile for unauthenticated user', async () => {
-  const response = await request(app).get('/users/me')
+  const response = await request(app).get('/api/users/me')
     .send()
     .expect(400);
 

@@ -3,12 +3,12 @@ const jwt = require('jsonwebtoken');
 const secret = require('../config/jwtSecret');
 const { setupDatabase, validAdminUser, validNormalUser, notActivatedUser } = require('./users.dataInit');
 const { findUserByCredentials, findUserOtp } = require('../database/users');
-const app = require('../app').router;
+const app = require('../server');
 
 beforeAll(setupDatabase);
 
 test('Should sign up valid normal user', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .send({
       email: 'anhhung@gmail.com',
       name: 'anh Hung',
@@ -25,7 +25,7 @@ test('Should sign up valid normal user', async () => {
 });
 
 test('Should not sign up invalid user 1', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .send({
       email: '@gmail.com',
       name: '',
@@ -44,7 +44,7 @@ test('Should not sign up invalid user 1', async () => {
 });
 
 test('Should not sign up invalid user 2', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .send({
       email: validNormalUser.email,
       name: 'longlonglonglonglonglonglonglonglonglonglonglonglong',
@@ -64,7 +64,7 @@ test('Should not sign up invalid user 2', async () => {
 });
 
 test('Should sign up valid admin user', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .set('access-token', jwt.sign({ id: validAdminUser._id, platform: 'web' }, secret, { expiresIn: '2h' }))
     .send({
       email: 'anhno@gmail.com',
@@ -80,7 +80,7 @@ test('Should sign up valid admin user', async () => {
 });
 
 test('Should not sign up admin user with false token (wrong secret)', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .set('access-token', jwt.sign({ id: validAdminUser._id }, 'secret', { expiresIn: '2h' }))
     .send({
       email: 'anonymous@gmail.com',
@@ -94,7 +94,7 @@ test('Should not sign up admin user with false token (wrong secret)', async () =
 });
 
 test('Shoud not sign up admin user with false token (normal user)', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .set('access-token', jwt.sign({ id: validNormalUser._id, platform: 'web' }, secret, { expiresIn: '2h' }))
     .send({
       email: 'anonymous@gmail.com',
@@ -111,7 +111,7 @@ test('Shoud not sign up admin user with false token (normal user)', async () => 
 });
 
 test('Should change profile for user who has not activated yet(reuse email)', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .send({
       email: notActivatedUser.email,
       name: 'newname',
@@ -126,7 +126,7 @@ test('Should change profile for user who has not activated yet(reuse email)', as
 });
 
 test('Should change profile for user who has not activated yet(reuse phone)', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .send({
       email: 'newemail@valid.com',
       name: 'newname',
@@ -141,7 +141,7 @@ test('Should change profile for user who has not activated yet(reuse phone)', as
 });
 
 test('Should not change profile for activated user', async () => {
-  const response = await request(app).post('/users/register')
+  const response = await request(app).post('/api/users/register')
     .send({
       email: validNormalUser.email,
       name: 'newname',

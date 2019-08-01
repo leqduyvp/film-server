@@ -1,16 +1,16 @@
 const express = require('express');
 const router = new express.Router();
-const userValid = require('../services/users.valid');
-const userSave = require('../services/users.save');
-const userLogin = require('../services/users.login');
-const authToken = require('../services/token.auth');
-const userLogout = require('../services/users.logout');
-const getUserProfile = require('../services/users.getProfile');
-const changeUserProfile = require('../services/users.changeProfile');
-const getAllUser = require('../services/users.getAll');
-const userDelete = require('../services/users.delete');
-const getWatchedFilms = require('../services/users.getWatchedFilms');
-const userActivate = require('../services/users.activate');
+const userValid = require('../service/users.valid');
+const userSave = require('../service/users.save');
+const userLogin = require('../service/users.login');
+const authToken = require('../service/token.auth');
+const userLogout = require('../service/users.logout');
+const getUserProfile = require('../service/users.getProfile');
+const changeUserProfile = require('../service/users.changeProfile');
+const getAllUser = require('../service/users.getAll');
+const userDelete = require('../service/users.delete');
+const getWatchedFilms = require('../service/users.getWatchedFilms');
+const userActivate = require('../service/users.activate');
 //Dang Ky
 router.post('/register', userValid, userSave);
 

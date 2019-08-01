@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('./users.model');
 const watchedFilms = require('./watchedFilms.model');
-const client = require('./cache.connection');
+const { client } = require('../service/redis.connection');
 
 const userSave = async (user) => {
   if (!user._id) {
@@ -82,7 +82,7 @@ const checkPhoneExist = (phone) => {
 
 const findUserByIdAndUpdate = async (id, updates) => {
   const user = await User.findById(id);
-  if(updates.password) updates.password = await bcrypt.hash(updates.password, 8);
+  if (updates.password) updates.password = await bcrypt.hash(updates.password, 8);
   for (let key in updates) {
     user[key] = updates[key];
   }

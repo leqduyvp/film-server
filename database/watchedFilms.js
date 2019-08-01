@@ -1,5 +1,5 @@
 const WatchedFilms = require('./watchedFilms.model');
-const client = require('./cache.connection');
+const {client} = require('../service/redis.connection');
 
 const watchedFilmsSave = (watchedFilmsObject) => {
   return new WatchedFilms(watchedFilmsObject).save();
