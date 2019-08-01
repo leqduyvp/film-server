@@ -7,9 +7,9 @@ module.exports = {
   limitedPagesCache: 10,                     // The number of pages cached
 
   // Custom configs
-  timeoutAllBanners: 6 * 60 * 60,           // seconds
-  timeoutAllCategories: 6 * 60 * 60,        // seconds
-  timeoutAllConfigs: 10 * 24 * 60 * 60,     // seconds
+  timeoutAllBanners: 10,           // seconds
+  timeoutAllCategories: 10,        // seconds
+  timeoutAllConfigs: 10,     // seconds
   timeoutFilmsCategory: 10,                 // seconds
   timeoutFilterFilms: 10,                   // seconds
   timeoutSearchFilmByField: 10,             // seconds
