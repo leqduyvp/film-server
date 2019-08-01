@@ -12,14 +12,12 @@ const RateSchema = new mongoose.Schema({
     required: true
   },
   rates: [{
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      unique: true,
-      required: true,
-      index: true
-    },
     rating: {
       type: Number,
+      required: true
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true
     }
   }]
