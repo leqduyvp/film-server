@@ -19,7 +19,7 @@ const normalUserFilms = {
   userId: validNormalUser._id,
   films: [{
     id: new mongoose.Types.ObjectId(),
-    title: 'Shazam(2019)',
+    title: { title_en: 'Shazam(2019)' },
     episodeNumber: 1,
     episodeNumberCurrent: 1,
     thumb: 'asdf'

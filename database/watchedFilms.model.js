@@ -11,7 +11,7 @@ const WatchedFilmsSchema = new mongoose.Schema({
       required: true
     },
     title: {
-      type: String,
+      type: Object,
       required: true
     },
     episodeNumber: {
