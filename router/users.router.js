@@ -9,6 +9,7 @@ const getUserProfile = require('../service/users.getProfile');
 const changeUserProfile = require('../service/users.changeProfile');
 const getAllUser = require('../service/users.getAll');
 const userDelete = require('../service/users.delete');
+const addWatchedFilms = require('../service/users.addWatchedFilms');
 const getWatchedFilms = require('../service/users.getWatchedFilms');
 const userActivate = require('../service/users.activate');
 //Dang Ky
@@ -40,6 +41,8 @@ router.patch('/edit', authToken, changeUserProfile);
 
 //Lay phim da xem
 //List phim tra theo mang object
+router.post('/watchFilms', authToken, addWatchedFilms)
+
 router.get('/watchFilms', authToken, getWatchedFilms);
 
 router.all('/*', (req, res) => {
