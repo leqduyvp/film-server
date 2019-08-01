@@ -162,9 +162,11 @@ const setSearchFilmsToCache = (input, page = pageNumber, records = recordsNumber
     return;
   }
 
+  console.log(input)
+
   console.log('set search films to cache');
 
-  const key = makeKey({ input }, page, records, fieldSearchFilm);
+  const key = makeKey(input, page, records, fieldSearchFilm);
 
   storeToRedis(key, films, timeoutSearchFilm);
 }
