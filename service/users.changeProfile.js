@@ -21,7 +21,10 @@ const validUpdates = (updates, error) => {
 }
 
 module.exports = async (req, res, next) => {
-  const updates = req.body;
+  const updates = { ...req.body };
+  updates.password = updates.newPassword;
+  delete updates.oldPassword;
+  delete updates.newPassword;
   const error = {
     isError: false,
     errorMessage: {}
@@ -31,7 +34,9 @@ module.exports = async (req, res, next) => {
     return res.status(400).send({ error });
   }
   try {
-    await findUserByIdAndUpdate(req.userId, updates);
+    updates.oldPassword = req.body.oldPassword;
+    const updateRes = await findUserByIdAndUpdate(req.userId, updates);
+    if (updateRes.error) return res.status(401).send(updateRes);
     res.send({
       error: {
         isError: false,

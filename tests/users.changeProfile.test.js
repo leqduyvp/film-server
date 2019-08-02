@@ -15,9 +15,11 @@ test("Should update valid field", async () => {
     .set('access-token', userToken)
     .send({
       name: 'newname',
-      password: 'newpassword'
+      oldPassword: 'validuser',
+      newPassword: 'newpassword'
     })
     .expect(200);
+  // console.log(response.body);
   expect(response.body.error.isError).toBeFalsy();
   const user = JSON.parse(await findUserById(validNormalUser._id));
   expect(user.name).toEqual('newname');
@@ -28,7 +30,8 @@ test("Should not update unauthenticated user", async () => {
   const response = await request(app).patch('/api/users/edit')
     .send({
       name: 'newname',
-      password: 'newpassword'
+      oldPassword: 'validuser',
+      newPassword: 'newpassword'
     })
     .expect(400);
   //console.log(response.body);
@@ -50,8 +53,21 @@ test("Should not update invalid data", async () => {
     .set('access-token', userToken)
     .send({
       name: '',
-      password: '123'
+      oldPassword: 'validuser',
+      newPassword: '123'
     })
     .expect(400);
+  expect(response.body.error.isError).toBeTruthy();
+});
+
+test("Should not update password when oldPassword is false", async () => {
+  const response = await request(app).patch('/api/users/edit')
+    .set('access-token', userToken)
+    .send({
+      name: 'newname',
+      oldPassword: 'wrongpass',
+      newPassword: 'newpassword'
+    })
+    .expect(401);
   expect(response.body.error.isError).toBeTruthy();
 })
