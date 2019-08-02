@@ -16,8 +16,7 @@ test('Should activate for not activated user', async () => {
 
   const otp = await findUserOtp(regisRes.body.userId);
   const response = await request(app).post('/api/users/activate')
-    .query({ userId: regisRes.body.userId })
-    .send({ otp })
+    .send({ otp, userId: regisRes.body.userId })
 
     .expect(200);
   expect(response.body.error.isError).toBeFalsy();
@@ -27,8 +26,7 @@ test('Should activate for not activated user', async () => {
 
 test('Should not activate for activated user', async () => {
   const response = await request(app).post('/api/users/activate')
-    .query({ userId: validNormalUser._id.toHexString() })
-    .send({ otp: '1234' })
+    .send({ otp: '1234', userId: validNormalUser._id.toHexString() })
     .expect(400);
   expect(response.body.error.isError).toBeTruthy();
 })

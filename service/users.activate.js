@@ -2,7 +2,7 @@ const { findUserOtp, findUserByIdAndUpdate } = require('../database/users');
 
 module.exports = async (req, res, next) => {
   try {
-    const userOtp = await findUserOtp(req.query.userId);
+    const userOtp = await findUserOtp(req.body.userId);
     console.log(userOtp);
     if (userOtp != req.body.otp) {
       return res.status(400).send({
@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
       });
     }
 
-    await findUserByIdAndUpdate(req.query.userId, { activated: true });
+    await findUserByIdAndUpdate(req.body.userId, { activated: true });
     res.status(200).send({
       error: {
         isError: false,
